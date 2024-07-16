@@ -30,7 +30,7 @@ pub enum Namespaces {
 
 #[account]
 pub struct Rule {
-    pub app_id: Pubkey,
+    pub file_id: Pubkey,
     pub namespace: u8,
     pub role: String,
     pub resource: String,
@@ -43,5 +43,5 @@ pub struct Rule {
 pub struct RulesChanged {
     pub time: i64,
     #[index]
-    pub app_id: Pubkey,
+    pub file_id: Pubkey,
 }

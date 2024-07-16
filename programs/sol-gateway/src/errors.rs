@@ -2,7 +2,7 @@ use anchor_lang::error_code;
 
 #[error_code]
 pub enum Errors {
-    #[msg("Only current Authority or Recovery accounts can update the App authority")]
+    #[msg("Only current Authority or Recovery accounts can update the File authority")]
     UnauthorizedAuthorityUpdate,
     #[msg("Role, Resource or Permission must be betwen 1 and 16 alphanumeric characters long")]
     InvalidRule,
@@ -14,15 +14,15 @@ pub enum Errors {
     StringTooLong,
     #[msg("The user does not have enough privileges to perform this action")]
     Unauthorized,
-    #[msg("The Sol Cerberus APP ID does not match the one defined in the program")]
+    #[msg("The Sol Gateway FILE ID does not match the one defined in the program")]
     InvalidAppID,
     #[msg("Invalid address type, mus be either 'Wallet', 'Nft', 'Collection' or a wildcard '*'")]
     InvalidAddressType,
     #[msg("Invalid namespace, must be either an u8 number (0-255) or a wildcard '*'")]
     InvalidNamespace,
-    #[msg("SOL_CERBERUS_APP_ID is missing on lib.rs")]
+    #[msg("GATEWAY_FILE_ID is missing on lib.rs")]
     MissingSolCerberusAppId,
-    #[msg("The Sol Cerberus Seed account is missing")]
+    #[msg("The Gateway Seed account is missing")]
     MissingSeedAccount,
     #[msg("Only program authority can perform this action")]
     UnauthorizedProgramAuthority,

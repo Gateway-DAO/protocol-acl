@@ -1,5 +1,5 @@
 use crate::utils::utc_now;
-use crate::{state::app::*, utils::validate_string_len};
+use crate::{state::file::*, utils::validate_string_len};
 use anchor_lang::prelude::*;
 
 // SPACE SIZE:
@@ -32,7 +32,7 @@ pub struct InitializeApp<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn initialize_app(ctx: Context<InitializeApp>, app_data: AppData) -> Result<()> {
+pub fn initialize_file(ctx: Context<InitializeApp>, app_data: AppData) -> Result<()> {
     let app = &mut ctx.accounts.app;
     app.id = app_data.id;
     app.account_type = AccountTypes::Basic as u8;

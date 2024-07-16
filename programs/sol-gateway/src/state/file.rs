@@ -19,7 +19,7 @@ pub enum CacheUpdated {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Debug)]
-pub struct AppData {
+pub struct FileData {
     pub id: Pubkey,
     pub recovery: Option<Pubkey>,
     pub name: String,
@@ -27,7 +27,7 @@ pub struct AppData {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Debug)]
-pub struct UpdateAppData {
+pub struct UpdateFileData {
     pub authority: Pubkey,
     pub recovery: Option<Pubkey>,
     pub name: String,
@@ -38,7 +38,7 @@ pub struct UpdateAppData {
 }
 
 #[account]
-pub struct App {
+pub struct File {
     pub id: Pubkey,
     pub authority: Pubkey,
     pub recovery: Option<Pubkey>, // Only recovery or authority accounts can update the App Authority.
@@ -53,10 +53,10 @@ pub struct App {
 }
 
 #[event]
-pub struct AppChanged {
+pub struct FileChanged {
     pub time: i64,
     #[index]
-    pub app_id: Pubkey,
+    pub file_id: Pubkey,
     pub authority: Pubkey,
 }
 

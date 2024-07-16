@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
 pub enum AddressType {
     Wallet,
-    Nft,
+    // Nft,
     Collection,
 }
 
@@ -11,7 +11,7 @@ impl AddressType {
     pub fn to_string(&self) -> String {
         match self {
             AddressType::Wallet => "Wallet",
-            AddressType::Nft => "Nft",
+            // AddressType::Nft => "Nft",            
             AddressType::Collection => "Collection",
         }
         .to_string()
@@ -28,7 +28,7 @@ pub struct AssignRoleData {
 
 #[account]
 pub struct Role {
-    pub app_id: Pubkey,
+    pub file_id: Pubkey,
     pub address: Option<Pubkey>,
     pub role: String,
     pub address_type: AddressType,
@@ -40,5 +40,5 @@ pub struct Role {
 pub struct RolesChanged {
     pub time: i64,
     #[index]
-    pub app_id: Pubkey,
+    pub file_id: Pubkey,
 }

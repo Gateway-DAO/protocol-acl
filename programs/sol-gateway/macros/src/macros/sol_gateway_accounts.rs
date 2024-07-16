@@ -42,13 +42,13 @@ fn parse_field(quoted_field: TokenStream2) -> Field {
     syn::Field::parse_named.parse2(quoted_field).unwrap()
 }
 
-pub fn sol_cerberus_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> TokenStream {
+pub fn sol_gateway_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> TokenStream {
     let mut item = parse_macro_input!(item as ItemStruct);
     // Get Signer
     let mut signer: Option<Ident> = None;
     // Get system_program
     let mut system_program: Option<Ident> = None;
-    // Remove all fields starting by "sol_cerberus" to protect namespace
+    // Remove all fields starting by "sol_gateway" to protect namespace
     let mut new_fields = match item.fields {
         Fields::Named(named_fields) => {
             let mut new_named_fields = named_fields.clone();

@@ -47,9 +47,9 @@ fn extract_sc_local_vars(block: &mut syn::Block, var_values: &mut [TokenStream2;
          - sol_cerberus_permission
     */
     let var_names: [&str; 3] = [
-        "sol_cerberus_app_id",
-        "sol_cerberus_resource",
-        "sol_cerberus_permission",
+        "sol_gateway_file_id",
+        "sol_gateway_resource",
+        "sol_gateway_permission",
     ];
     let mut found_indexes: Vec<usize> = Vec::new();
     for i in 0..block.stmts.len() {
@@ -113,15 +113,15 @@ pub fn rule_macro(args: TokenStream, item: TokenStream) -> TokenStream {
     ];
     // Find Sol Cerberus app ID on the current function scope (when defined)
     extract_sc_local_vars(&mut item.block, &mut sc_vars);
-    let sc_app_id: &TokenStream2 = &sc_vars[0];
+    let sc_file_id: &TokenStream2 = &sc_vars[0];
     let sc_resource: &TokenStream2 = &sc_vars[1];
     let sc_permission: &TokenStream2 = &sc_vars[2];
     let ctx_arg_name: Ident = ctx_arg_name.unwrap();
     let cpi_call: TokenStream2 = quote! {
-        sol_cerberus::cpi::allowed(
-            #ctx_arg_name.accounts.sol_cerberus_ctx(),
-            sol_cerberus::instructions::AllowedRule {
-                app_id: #sc_app_id,
+        sol_gateway::cpi::allowed(
+            #ctx_arg_name.accounts.sol_gateway_ctx(),
+            sol_gateway::instructions::AllowedRule {
+                app_id: #sc_file_id,
                 namespace: 0 as u8, // Rule
                 resource: #sc_resource.to_string(),
                 permission: #sc_permission.to_string(),
