@@ -10,6 +10,6 @@ pub fn rule(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn sol_cerberus_accounts(args: TokenStream, input: TokenStream) -> TokenStream {
-    sol_cerberus_accounts_macro(args, input)
+pub fn sol_gateway_accounts(args: TokenStream, input: TokenStream) -> TokenStream {
+    sol_gateway_accounts_macro(args, input)
 }

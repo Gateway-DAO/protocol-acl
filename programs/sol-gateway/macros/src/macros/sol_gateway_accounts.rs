@@ -62,7 +62,7 @@ pub fn sol_gateway_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> T
                         system_program = field.ident.clone();
                         return false;
                     } else if let Some(ref ident) = field.ident {
-                        return !ident.to_string().starts_with("sol_cerberus");
+                        return !ident.to_string().starts_with("sol_gateway");
                     }
                     true
                 })
@@ -88,38 +88,38 @@ pub fn sol_gateway_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> T
         None => quote! { system_program },
     };
 
-    // Add required Sol Cerberus accounts to struct:
+    // Add required Sol Gateway accounts to struct:
     if let syn::Fields::Named(ref mut fields) = new_fields {
         fields.named.push(parse_field(quote! {
             /// CHECK: Validated on CPI call
-            pub sol_cerberus_app: UncheckedAccount<#lifetime>
+            pub sol_gateway_app: UncheckedAccount<#lifetime>
         }));
         fields.named.push(parse_field(quote! {
             /// CHECK: Validated on CPI call
-            pub sol_cerberus_rule: Option<UncheckedAccount<#lifetime>>
+            pub sol_gateway_rule: Option<UncheckedAccount<#lifetime>>
         }));
         fields.named.push(parse_field(quote! {
             /// CHECK: Validated on CPI call
-            pub sol_cerberus_role: Option<UncheckedAccount<#lifetime>>
+            pub sol_gateway_role: Option<UncheckedAccount<#lifetime>>
         }));
         fields.named.push(parse_field(quote! {
             #[cfg_attr(not(test), account())]
-            pub sol_cerberus_token: Option<Box<Account<#lifetime, anchor_spl::token::TokenAccount>>>
+            pub sol_gateway_token: Option<Box<Account<#lifetime, anchor_spl::token::TokenAccount>>>
         }));
         fields.named.push(parse_field(quote! {
             #[cfg_attr(not(test), account(
-                seeds = [b"metadata", sol_cerberus::metadata_program::ID.as_ref(), sol_cerberus_metadata.mint.key().as_ref()],
-                seeds::program = sol_cerberus::metadata_program::ID,
+                seeds = [b"metadata", sol_gateway::metadata_program::ID.as_ref(), sol_gateway_metadata.mint.key().as_ref()],
+                seeds::program = sol_gateway::metadata_program::ID,
                 bump,
             ))]
-            pub sol_cerberus_metadata: Option<Box<Account<#lifetime, anchor_spl::metadata::MetadataAccount>>>
+            pub sol_gateway_metadata: Option<Box<Account<#lifetime, anchor_spl::metadata::MetadataAccount>>>
         }));
         fields.named.push(parse_field(quote! {
             #[account(mut)]
-            pub sol_cerberus_seed: Option<UncheckedAccount<#lifetime>>
+            pub sol_gateway_seed: Option<UncheckedAccount<#lifetime>>
         }));
         fields.named.push(parse_field(quote! {
-            pub sol_cerberus: Program<#lifetime, SolCerberus>
+            pub sol_gateway: Program<#lifetime, SolCerberus>
         }));
         // Note this account must be the very last!
         fields.named.push(parse_field(quote! {
@@ -132,28 +132,28 @@ pub fn sol_gateway_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> T
     let result = quote! {
         #item
         impl<'info> #struct_name<'info> {
-            pub fn sol_cerberus_ctx(&self) -> CpiContext<'_, '_, '_, 'info, sol_cerberus::cpi::accounts::Allowed<'info>> {
-                let cpi_program = self.sol_cerberus.to_account_info();
-                let cpi_accounts = sol_cerberus::cpi::accounts::Allowed {
+            pub fn sol_gateway_ctx(&self) -> CpiContext<'_, '_, '_, 'info, sol_gateway::cpi::accounts::Allowed<'info>> {
+                let cpi_program = self.sol_gateway.to_account_info();
+                let cpi_accounts = sol_gateway::cpi::accounts::Allowed {
                     signer: self.#signer.to_account_info(),
-                    sol_cerberus_app: self.sol_cerberus_app.to_account_info(),
-                    sol_cerberus_rule: match self.sol_cerberus_rule.as_ref() {
+                    sol_gateway_app: self.sol_gateway_app.to_account_info(),
+                    sol_gateway_rule: match self.sol_gateway_rule.as_ref() {
                         None => None,
                         Some(x) => Some(x.to_account_info()),
                     },
-                    sol_cerberus_role: match self.sol_cerberus_role.as_ref() {
+                    sol_gateway_role: match self.sol_gateway_role.as_ref() {
                         None => None,
                         Some(x) => Some(x.to_account_info()),
                     },
-                    sol_cerberus_token: match self.sol_cerberus_token.as_ref() {
+                    sol_gateway_token: match self.sol_gateway_token.as_ref() {
                         None => None,
                         Some(x) => Some(x.to_account_info()),
                     },
-                    sol_cerberus_metadata: match self.sol_cerberus_metadata.as_ref() {
+                    sol_gateway_metadata: match self.sol_gateway_metadata.as_ref() {
                         None => None,
                         Some(x) => Some(x.to_account_info()),
                     },
-                    sol_cerberus_seed: match self.sol_cerberus_seed.as_ref() {
+                    sol_gateway_seed: match self.sol_gateway_seed.as_ref() {
                         None => None,
                         Some(x) => Some(x.to_account_info()),
                     },

@@ -11,17 +11,17 @@ pub struct UpdateCache<'info> {
         seeds = [b"app".as_ref(), app.id.key().as_ref()], 
         bump = app.bump,
     )]
-    pub app: Account<'info, App>,
+    pub file: Account<'info, App>,
     pub system_program: Program<'info, System>,
 }
 
 pub fn update_cache(ctx: Context<UpdateCache>, cache_updated: u8) -> Result<()> {
-    let app = &mut ctx.accounts.app;
+    let file = &mut ctx.accounts.app;
     let now = utc_now();
     if cache_updated == CacheUpdated::Roles as u8 {
-        app.roles_updated_at = now;
+        file.roles_updated_at = now;
     } else {
-        app.rules_updated_at = now;
+        file.rules_updated_at = now;
     }
     emit!(AppChanged {
         time: now,

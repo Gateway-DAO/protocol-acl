@@ -42,9 +42,9 @@ pub fn extract_rule(args: &TokenStream) -> (String, String) {
 fn extract_sc_local_vars(block: &mut syn::Block, var_values: &mut [TokenStream2; 3]) {
     /*
        Extracts the following variables from the function body (when present) to apply the dynamically assigned values.
-         - sol_cerberus_app_id
-         - sol_cerberus_resource
-         - sol_cerberus_permission
+         - sol_gateway_file_id
+         - sol_gateway_resource
+         - sol_gateway_permission
     */
     let var_names: [&str; 3] = [
         "sol_gateway_file_id",

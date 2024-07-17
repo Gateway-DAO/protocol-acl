@@ -13,18 +13,18 @@ pub struct Allowed<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
     #[account(
-        seeds = [b"app".as_ref(), sol_cerberus_app.id.key().as_ref()], 
-        bump = sol_cerberus_app.bump,
+        seeds = [b"app".as_ref(), sol_gateway_app.id.key().as_ref()], 
+        bump = sol_gateway_app.bump,
     )]
-    pub sol_cerberus_app: Box<Account<'info, App>>,
+    pub sol_gateway_app: Box<Account<'info, App>>,
     #[account(
-        seeds = [sol_cerberus_rule.namespace.to_le_bytes().as_ref(), sol_cerberus_rule.role.as_ref(), sol_cerberus_rule.resource.as_ref(), sol_cerberus_rule.permission.as_ref(), sol_cerberus_rule.app_id.key().as_ref()], 
-        bump = sol_cerberus_rule.bump,
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()], 
+        bump = sol_gateway_rule.bump,
     )]
-    pub sol_cerberus_rule: Option< Box<Account<'info, Rule>>>,
+    pub sol_gateway_rule: Option< Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_cerberus_role.role.as_ref(), address_or_wildcard(&sol_cerberus_role.address), sol_cerberus_role.app_id.key().as_ref()], 
-        bump = sol_cerberus_role.bump
+        seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.app_id.key().as_ref()], 
+        bump = sol_gateway_role.bump
     )]
     pub sol_cerberus_role: Option< Box<Account<'info, Role>>>,
     #[account()]

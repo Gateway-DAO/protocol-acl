@@ -26,34 +26,34 @@ pub struct AssignRole<'info> {
         init,
         payer = signer,
         space = 105,
-        seeds = [assign_role_data.role.as_ref(), address_or_wildcard(&assign_role_data.address), sol_cerberus_app.id.key().as_ref()],
+        seeds = [assign_role_data.role.as_ref(), address_or_wildcard(&assign_role_data.address), sol_gateway_app.id.key().as_ref()],
         constraint = valid_rule(&assign_role_data.role, true)  @ InvalidRole,
         bump
     )]
     pub role: Account<'info, Role>,
     #[account(
-        seeds = [b"app".as_ref(), sol_cerberus_app.id.key().as_ref()],
-        bump = sol_cerberus_app.bump,
+        seeds = [b"app".as_ref(), sol_gateway_app.id.key().as_ref()],
+        bump = sol_gateway_app.bump,
     )]
-    pub sol_cerberus_app: Box<Account<'info, App>>,
+    pub sol_gateway_app: Box<Account<'info, App>>,
     #[account(
-        seeds = [sol_cerberus_role.role.as_ref(),  address_or_wildcard(&sol_cerberus_role.address), sol_cerberus_role.app_id.key().as_ref()],
-        bump = sol_cerberus_role.bump
+        seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
+        bump = sol_gateway_role.bump
     )]
-    pub sol_cerberus_role: Option<Box<Account<'info, Role>>>,
+    pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
     #[account(
-        seeds = [sol_cerberus_rule.namespace.to_le_bytes().as_ref(), sol_cerberus_rule.role.as_ref(), sol_cerberus_rule.resource.as_ref(), sol_cerberus_rule.permission.as_ref(), sol_cerberus_rule.app_id.key().as_ref()],
-        bump = sol_cerberus_rule.bump,
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
+        bump = sol_gateway_rule.bump,
     )]
-    pub sol_cerberus_rule: Option<Box<Account<'info, Rule>>>,
+    pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
     #[account()]
-    pub sol_cerberus_token: Option<Box<Account<'info, TokenAccount>>>,
+    pub sol_gateway_token: Option<Box<Account<'info, TokenAccount>>>,
     #[account(
-        seeds = [b"metadata", metadata_program::ID.as_ref(), sol_cerberus_metadata.mint.key().as_ref()],
+        seeds = [b"metadata", metadata_program::ID.as_ref(), sol_gateway_metadata.mint.key().as_ref()],
         seeds::program = metadata_program::ID,
         bump,
     )]
-    pub sol_cerberus_metadata: Option<Box<Account<'info, MetadataAccount>>>,
+    pub sol_gateway_metadata: Option<Box<Account<'info, MetadataAccount>>>,
     #[account(
         init_if_needed,
         payer = signer,
@@ -61,22 +61,22 @@ pub struct AssignRole<'info> {
         seeds = [b"seed".as_ref(), signer.key.as_ref()],
         bump
     )]
-    pub sol_cerberus_seed: Option<Account<'info, Seed>>,
+    pub sol_gateway_seed: Option<Account<'info, Seed>>,
     pub system_program: Program<'info, System>,
 }
 
 pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
     allowed(
         &ctx.accounts.signer,
-        &ctx.accounts.sol_cerberus_app,
-        &ctx.accounts.sol_cerberus_role,
-        &ctx.accounts.sol_cerberus_rule,
-        &ctx.accounts.sol_cerberus_token,
-        &ctx.accounts.sol_cerberus_metadata,
-        &mut ctx.accounts.sol_cerberus_seed,
+        &ctx.accounts.sol_gateway_app,
+        &ctx.accounts.sol_gateway_role,
+        &ctx.accounts.sol_gateway_rule,
+        &ctx.accounts.sol_gateway_token,
+        &ctx.accounts.sol_gateway_metadata,
+        &mut ctx.accounts.sol_gateway_seed,
         &ctx.accounts.system_program,
         AllowedRule {
-            app_id: ctx.accounts.sol_cerberus_app.id.key(),
+            app_id: ctx.accounts.sol_gateway_app.id.key(),
             namespace: Namespaces::AssignRole as u8,
             resource: assign_role_data.address_type.to_string(),
             permission: assign_role_data.role.clone(),
@@ -85,14 +85,14 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
 
     let role = &mut ctx.accounts.role;
     role.bump = ctx.bumps.role;
-    role.app_id = ctx.accounts.sol_cerberus_app.id;
+    role.app_id = ctx.accounts.sol_gateway_app.id;
     role.address = assign_role_data.address;
     role.role = assign_role_data.role;
     role.address_type = assign_role_data.address_type;
     role.expires_at = assign_role_data.expires_at;
     emit!(RolesChanged {
         time: utc_now(),
-        app_id: ctx.accounts.sol_cerberus_app.id,
+        app_id: ctx.accounts.sol_gateway_app.id,
     });
     Ok(())
 }

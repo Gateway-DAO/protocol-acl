@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 pub use constants::*;
 use errors::*;
 use instructions::*;
-pub use sol_cerberus_macros;
+pub use sol_gateway_macros;
 use state::*;
 
 pub mod constants;
@@ -14,7 +14,7 @@ pub mod utils;
 declare_id!("SCERbrcgSPwgkrJ7j4TABr17dhYzdgiwPZUSSfFPt8x");
 
 #[program]
-pub mod sol_cerberus {
+pub mod sol_gateway {
 
     use super::*;
 
@@ -61,12 +61,12 @@ pub mod sol_cerberus {
     pub fn allowed(ctx: Context<Allowed>, allowed_rule: AllowedRule) -> Result<()> {
         instructions::allowed::allowed(
             &ctx.accounts.signer,
-            &ctx.accounts.sol_cerberus_app,
-            &ctx.accounts.sol_cerberus_role,
-            &ctx.accounts.sol_cerberus_rule,
-            &ctx.accounts.sol_cerberus_token,
-            &ctx.accounts.sol_cerberus_metadata,
-            &mut ctx.accounts.sol_cerberus_seed,
+            &ctx.accounts.sol_gateway_app,
+            &ctx.accounts.sol_gateway_role,
+            &ctx.accounts.sol_gateway_rule,
+            &ctx.accounts.sol_gateway_token,
+            &ctx.accounts.sol_gateway_metadata,
+            &mut ctx.accounts.sol_gateway_seed,
             &ctx.accounts.system_program,
             allowed_rule,
         )
