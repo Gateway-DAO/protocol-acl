@@ -18,7 +18,7 @@ use anchor_lang::prelude::*;
 // total = 8 + 32  + 32 + 1 + 32 + 4 + 16 + 8 + 8 + 1 + 1 + 8 + 1 + 1 + 8 + 1 = 162
 #[derive(Accounts)]
 #[instruction(app_data: AppData)]
-pub struct InitializeApp<'info> {
+pub struct InitializeFiles<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
     #[account(
@@ -32,7 +32,7 @@ pub struct InitializeApp<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn initialize_file(ctx: Context<InitializeApp>, app_data: AppData) -> Result<()> {
+pub fn initialize_files(ctx: Context<InitializeFiles>, app_data: AppData) -> Result<()> {
     let app = &mut ctx.accounts.app;
     app.id = app_data.id;
     app.account_type = AccountTypes::Basic as u8;

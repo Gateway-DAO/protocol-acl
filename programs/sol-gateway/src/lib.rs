@@ -18,16 +18,16 @@ pub mod sol_gateway {
 
     use super::*;
 
-    pub fn initialize_app(ctx: Context<InitializeApp>, app_data: AppData) -> Result<()> {
-        instructions::initialize_app::initialize_app(ctx, app_data)
+    pub fn initialize_files(ctx: Context<InitializeFiles>, app_data: AppData) -> Result<()> {
+        instructions::initialize_files::initialize_files(ctx, app_data)
     }
 
-    pub fn update_app(ctx: Context<UpdateApp>, app_data: UpdateAppData) -> Result<()> {
-        instructions::update_app::update_app(ctx, app_data)
+    pub fn update_file(ctx: Context<UpdateApp>, app_data: UpdateAppData) -> Result<()> {
+        instructions::update_file::update_file(ctx, app_data)
     }
 
-    pub fn delete_app(ctx: Context<DeleteApp>) -> Result<()> {
-        instructions::delete_app::delete_app(ctx)
+    pub fn delete_file(ctx: Context<DeleteApp>) -> Result<()> {
+        instructions::delete_file::delete_file(ctx)
     }
 
     pub fn add_rule(ctx: Context<AddRule>, rule_data: RuleData) -> Result<()> {
