@@ -2,10 +2,10 @@ import * as anchor from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { FILE_ID, METADATA_PROGRAM_ID, PROGRAM, PROVIDER } from "./constants";
 
-export async function app_pda() {
+export async function file_pda() {
   return (
     await PublicKey.findProgramAddressSync(
-      [anchor.utils.bytes.utf8.encode("app"), FILE_ID.toBuffer()],
+      [anchor.utils.bytes.utf8.encode("file"), FILE_ID.toBuffer()],
       PROGRAM.programId
     )
   )[0];
