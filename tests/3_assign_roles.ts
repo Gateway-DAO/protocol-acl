@@ -1,19 +1,19 @@
 import { BN } from "bn.js";
 import { expect } from "chai";
-import { app_pda, role_pda, WRITE_PERM, READ_PERM } from "./common";
+import { file_pda, role_pda, WRITE_PERM, READ_PERM } from "./common";
 import {
   addressType,
-  APP_ID,
+  FILE_ID,
   NFTS,
   PROGRAM,
   ALLOWED_WALLET,
 } from "./constants";
 
 describe("3.- Assign roles", () => {
-  let appPDA = null; // Populated on before() block
+  let filePDA = null; // Populated on before() block
 
   before(async () => {
-    appPDA = await app_pda();
+    filePDA = await file_pda();
   });
 
   it("Assign role to NFT", async () => {
@@ -37,12 +37,12 @@ describe("3.- Assign roles", () => {
         })
         .accounts({
           role: rolePDA,
-          solCerberusApp: appPDA,
-          solCerberusRole: null,
-          solCerberusRule: null,
-          solCerberusToken: null,
-          solCerberusMetadata: null,
-          solCerberusSeed: null,
+          solGatewayFile: appPDA,
+          solGatewayRole: null,
+          solGatewayRule: null,
+          solGatewayToken: null,
+          solGatewayMetadata: null,
+          solGatewaySeed: null,
         })
         .rpc();
       setTimeout(() => {
@@ -51,7 +51,7 @@ describe("3.- Assign roles", () => {
     });
 
     const role = await PROGRAM.account.role.fetch(rolePDA);
-    expect(APP_ID.toBase58()).to.equal(event.appId.toBase58());
+    expect(FILE_ID.toBase58()).to.equal(event.fileId.toBase58());
     expect(role.address.toBase58()).to.equal(
       NFTS.allowedNFT.mintAddress.toBase58()
     );
@@ -74,12 +74,12 @@ describe("3.- Assign roles", () => {
       })
       .accounts({
         role: rolePDA,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
   });
@@ -95,12 +95,12 @@ describe("3.- Assign roles", () => {
       })
       .accounts({
         role: rolePDA,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
   });
@@ -116,12 +116,12 @@ describe("3.- Assign roles", () => {
       })
       .accounts({
         role: rolePDA,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
   });
