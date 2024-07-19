@@ -2,7 +2,7 @@ import * as anchor from "@project-serum/anchor";
 import { expect, assert } from "chai";
 import { app_pda, safe_airdrop } from "./common";
 import {
-  APP_ID,
+  FILE_ID,
   NFTS,
   PROVIDER,
   RECOVERY_KEYPAIR,
@@ -16,7 +16,7 @@ import {
 } from "./constants";
 
 describe("1.- Initialize APP", () => {
-  let appPDA = null; // Populated on before() block
+  let filePDA = null; // Populated on before() block
   const unauthorized_keypair = anchor.web3.Keypair.generate();
 
   // Create NFTs for testing access rules afterwards.
@@ -82,52 +82,52 @@ describe("1.- Initialize APP", () => {
   });
 
   it("Init", async () => {
-    const appName = "myapp";
+    const fileName = "test";
     try {
-      await PROGRAM.account.app.fetch(appPDA);
+      await PROGRAM.account.app.fetch(filePDA);
     } catch (_err) {
       expect(_err.toString()).to.include("Account does not exist");
     }
     const tx = await PROGRAM.methods
-      .initializeApp({
-        id: APP_ID,
+      .initializeFile({
+        id: FILE_ID,
         recovery: RECOVERY_KEYPAIR.publicKey,
-        name: appName,
+        name: fileName,
         cached: false,
       })
       .accounts({
-        app: appPDA,
+        file: filePDA,
       })
       .rpc();
-    let app = await PROGRAM.account.app.fetch(appPDA);
-    expect(app.id.toBase58()).to.equal(APP_ID.toBase58());
-    expect(app.authority.toBase58()).to.equal(
+    let file = await PROGRAM.account.file.fetch(filePDA);
+    expect(file.id.toBase58()).to.equal(FILE_ID.toBase58());
+    expect(file.authority.toBase58()).to.equal(
       PROVIDER.wallet.publicKey.toBase58()
     );
-    expect(app.name).to.equal(appName);
+    expect(file.name).to.equal(fileName);
   });
 
   it("Update authority", async () => {
     try {
       // Unauthorized users shouldn't be able to update App authority
       await PROGRAM.methods
-        .updateApp({
+        .updateFile({
           authority: unauthorized_keypair.publicKey,
           recovery: RECOVERY_KEYPAIR.publicKey,
-          name: "myapp-recovered",
+          name: "myfile-recovered",
           cached: false,
           fee: null,
           accountType: accountTypes.Basic,
           expiresAt: null,
         })
         .accounts({
-          app: appPDA,
+          app: filePDA,
           signer: unauthorized_keypair.publicKey,
         })
         .signers([unauthorized_keypair])
         .rpc();
       throw new Error(
-        "Unauthorized users shouldn't be able to update App authority!"
+        "Unauthorized users shouldn't be able to update File authority!"
       );
     } catch (error) {
       expect(error.error.errorCode.code).to.equal(
@@ -137,46 +137,46 @@ describe("1.- Initialize APP", () => {
 
     // Verify current Authority can update the authority of the APP
     await PROGRAM.methods
-      .updateApp({
+      .updateFile({
         authority: unauthorized_keypair.publicKey,
         recovery: RECOVERY_KEYPAIR.publicKey,
-        name: "myapp-recovered1",
+        name: "myfile-recovered1",
         cached: true,
         fee: null,
         accountType: accountTypes.Basic,
         expiresAt: null,
       })
       .accounts({
-        app: appPDA,
+        file: filePDA,
       })
       .rpc();
-    let app = await PROGRAM.account.app.fetch(appPDA);
-    expect(app.name).to.equal("myapp-recovered1");
-    assert.isTrue(app.cached);
-    expect(app.authority.toBase58()).to.equal(
+    let file = await PROGRAM.account.file.fetch(filePDA);
+    expect(file.name).to.equal("myfile-recovered1");
+    assert.isTrue(file.cached);
+    expect(file.authority.toBase58()).to.equal(
       unauthorized_keypair.publicKey.toBase58()
     );
     // Verify recovery can also update the authority of the APP
     await PROGRAM.methods
-      .updateApp({
+      .updateFile({
         authority: PROVIDER.wallet.publicKey,
         recovery: RECOVERY_KEYPAIR.publicKey,
-        name: "myapp-recovered2",
+        name: "myfile-recovered2",
         cached: false,
         fee: null,
         accountType: accountTypes.Basic,
         expiresAt: null,
       })
       .accounts({
-        app: appPDA,
+        file: filePDA,
         signer: RECOVERY_KEYPAIR.publicKey,
       })
       .signers([RECOVERY_KEYPAIR])
       .rpc();
-    app = await PROGRAM.account.app.fetch(appPDA);
-    expect(app.name).to.equal("myapp-recovered2");
-    assert.isFalse(app.cached);
-    expect(app.authority.toBase58()).to.equal(
+    file = await PROGRAM.account.file.fetch(filePDA);
+    expect(file.name).to.equal("myfile-recovered2");
+    assert.isFalse(file.cached);
+    expect(file.authority.toBase58()).to.equal(
       PROVIDER.wallet.publicKey.toBase58()
     );
   });
