@@ -126,7 +126,7 @@ describe("5.- Allow assign roles", () => {
     // Verify the new wallet is finally allowed to write
     await PROGRAM.methods
       .allowed({
-        appId: FILE_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: WRITE_PERM.resource,
         permission: WRITE_PERM.permission,
