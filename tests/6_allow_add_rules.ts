@@ -1,10 +1,10 @@
-import { app_pda, role_pda, WRITE_PERM, rule_pda, seed_pda } from "./common";
+import { file_pda, role_pda, WRITE_PERM, rule_pda, seed_pda } from "./common";
 import { PROGRAM, ALLOWED_WALLET, namespaces } from "./constants";
 import { expect } from "chai";
 import { PublicKey } from "@metaplex-foundation/js";
 
 describe("6.- Allow add rules", () => {
-  let appPDA: PublicKey | null = null; // Populated on before() block
+  let filePDA: PublicKey | null = null; // Populated on before() block
   let allowedWalletRolePDA = null; // Populated on before() block
   let newRulePDA: PublicKey | null = null; // Populated on before() block
   let nsRoleRulePDA: PublicKey | null = null; // Populated on before() block
@@ -14,7 +14,7 @@ describe("6.- Allow add rules", () => {
   const allPerms = "*";
 
   before(async () => {
-    appPDA = await app_pda();
+    filePDA = await file_pda();
     allowedWalletRolePDA = await role_pda(
       WRITE_PERM.role,
       ALLOWED_WALLET.publicKey
@@ -47,13 +47,13 @@ describe("6.- Allow add rules", () => {
         })
         .accounts({
           rule: newRulePDA,
-          solCerberusApp: appPDA,
-          solCerberusRole: allowedWalletRolePDA,
-          solCerberusRule: null,
-          solCerberusRule2: null,
-          solCerberusToken: null,
-          solCerberusMetadata: null,
-          solCerberusSeed: walletSeedPDA,
+          solGatewayFile: filePDA,
+          solGatewayRole: allowedWalletRolePDA,
+          solGatewayRule: null,
+          solGatewayRule2: null,
+          solGatewayToken: null,
+          solGatewayMetadata: null,
+          solGatewaySeed: walletSeedPDA,
           signer: ALLOWED_WALLET.publicKey,
         })
         .signers([ALLOWED_WALLET])
@@ -82,13 +82,13 @@ describe("6.- Allow add rules", () => {
       })
       .accounts({
         rule: nsRoleRulePDA,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusRule2: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayRule2: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
   });
@@ -108,13 +108,13 @@ describe("6.- Allow add rules", () => {
       })
       .accounts({
         rule: resourcePermRulePDA,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusRule2: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayRule2: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
   });
@@ -139,13 +139,13 @@ describe("6.- Allow add rules", () => {
           "Add",
           namespaces.Rule
         ),
-        solCerberusApp: appPDA,
-        solCerberusRole: allowedWalletRolePDA,
-        solCerberusRule: nsRoleRulePDA,
-        solCerberusRule2: resourcePermRulePDA,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: walletSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: allowedWalletRolePDA,
+        solGatewayRule: nsRoleRulePDA,
+        solGatewayRule2: resourcePermRulePDA,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: walletSeedPDA,
         signer: ALLOWED_WALLET.publicKey,
       })
       .signers([ALLOWED_WALLET])
@@ -169,13 +169,13 @@ describe("6.- Allow add rules", () => {
             "Add",
             namespaces.Rule
           ),
-          solCerberusApp: appPDA,
-          solCerberusRole: allowedWalletRolePDA,
-          solCerberusRule: nsRoleRulePDA,
-          solCerberusRule2: resourcePermRulePDA,
-          solCerberusToken: null,
-          solCerberusMetadata: null,
-          solCerberusSeed: walletSeedPDA,
+          solGatewayFile: filePDA,
+          solGatewayRole: allowedWalletRolePDA,
+          solGatewayRule: nsRoleRulePDA,
+          solGatewayRule2: resourcePermRulePDA,
+          solGatewayToken: null,
+          solGatewayMetadata: null,
+          solGatewaySeed: walletSeedPDA,
           signer: ALLOWED_WALLET.publicKey,
         })
         .signers([ALLOWED_WALLET])
