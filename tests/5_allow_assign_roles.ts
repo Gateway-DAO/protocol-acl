@@ -1,5 +1,5 @@
 import {
-  app_pda,
+  file_pda,
   role_pda,
   WRITE_PERM,
   rule_pda,
@@ -8,7 +8,7 @@ import {
 } from "./common";
 import {
   ANOTHER_WALLET,
-  APP_ID,
+  FILE_ID,
   PROGRAM,
   ALLOWED_WALLET,
   addressType,
@@ -17,7 +17,7 @@ import {
 import { expect } from "chai";
 
 describe("5.- Allow assign roles", () => {
-  let appPDA = null; // Populated on before() block
+  let filePDA = null; // Populated on before() block
   let writeRulePDA = null; // Populated on before() block
   let allowedWalletRole = null; // Populated on before() block
   let allowedWalletSeedPDA = null; // Populated on before() block
@@ -25,7 +25,7 @@ describe("5.- Allow assign roles", () => {
   let anotherWalletSeedPDA = null; // Populated on before() block
 
   before(async () => {
-    appPDA = await app_pda();
+    filePDA = await file_pda();
     writeRulePDA = await rule_pda(
       WRITE_PERM.role,
       WRITE_PERM.resource,
@@ -55,12 +55,12 @@ describe("5.- Allow assign roles", () => {
         })
         .accounts({
           role: anotherWalletRole,
-          solCerberusApp: appPDA,
-          solCerberusRole: allowedWalletRole,
-          solCerberusRule: null,
-          solCerberusToken: null,
-          solCerberusMetadata: null,
-          solCerberusSeed: allowedWalletSeedPDA,
+          solGatewayFile: filePDA,
+          solGatewayRole: allowedWalletRole,
+          solGatewayRule: null,
+          solGatewayToken: null,
+          solGatewayMetadata: null,
+          solGatewaySeed: allowedWalletSeedPDA,
           signer: ALLOWED_WALLET.publicKey,
         })
         .signers([ALLOWED_WALLET])
@@ -92,13 +92,13 @@ describe("5.- Allow assign roles", () => {
       })
       .accounts({
         rule: rulePDA,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusRule2: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayRule2: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
 
@@ -112,12 +112,12 @@ describe("5.- Allow assign roles", () => {
       })
       .accounts({
         role: anotherWalletRole,
-        solCerberusApp: appPDA,
-        solCerberusRole: allowedWalletRole,
-        solCerberusRule: rulePDA,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: allowedWalletSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: allowedWalletRole,
+        solGatewayRule: rulePDA,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: allowedWalletSeedPDA,
         signer: ALLOWED_WALLET.publicKey,
       })
       .signers([ALLOWED_WALLET])
@@ -126,18 +126,18 @@ describe("5.- Allow assign roles", () => {
     // Verify the new wallet is finally allowed to write
     await PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        appId: FILE_ID,
         namespace: namespaces.Rule,
         resource: WRITE_PERM.resource,
         permission: WRITE_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: anotherWalletRole,
-        solCerberusRule: writeRulePDA,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: anotherWalletSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: anotherWalletRole,
+        solGatewayRule: writeRulePDA,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: anotherWalletSeedPDA,
         signer: ANOTHER_WALLET.publicKey,
       })
       .signers([ANOTHER_WALLET])
