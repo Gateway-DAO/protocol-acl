@@ -1,5 +1,5 @@
 import {
-  app_pda,
+  file_pda,
   role_pda,
   nft_metadata_pda,
   WRITE_PERM,
@@ -8,7 +8,7 @@ import {
   seed_pda,
 } from "./common";
 import {
-  APP_ID,
+  FILE_ID,
   NFTS,
   PROGRAM,
   PROVIDER,
@@ -24,14 +24,14 @@ import { BN } from "bn.js";
 import { Transaction } from "@solana/web3.js";
 
 describe("4.- Check permissions", () => {
-  let appPDA = null; // Populated on before() block
+  let filePDA = null; // Populated on before() block
   let writeRulePDA = null; // Populated on before() block
   let readRulePDA = null; // Populated on before() block
   let walletSeedPDA = null; // Populated on before() block
   let WalletWithNFTSeedPDA = null; // Populated on before() block
 
   before(async () => {
-    appPDA = await app_pda();
+    filePDA = await file_pda();
     writeRulePDA = await rule_pda(
       WRITE_PERM.role,
       WRITE_PERM.resource,
@@ -53,18 +53,18 @@ describe("4.- Check permissions", () => {
     // Allowed to Write
     const ix = PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: WRITE_PERM.resource,
         permission: WRITE_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRule: writeRulePDA,
-        solCerberusRole: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRule: writeRulePDA,
+        solGatewayRole: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       });
     const recentBlockhash = await PROVIDER.connection.getLatestBlockhash();
     const fee = await new Transaction({
@@ -93,18 +93,18 @@ describe("4.- Check permissions", () => {
     );
     const ix = PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: WRITE_PERM.resource,
         permission: WRITE_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: rolePDA,
-        solCerberusRule: writeRulePDA,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: walletSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: rolePDA,
+        solGatewayRule: writeRulePDA,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: walletSeedPDA,
         signer: ALLOWED_WALLET.publicKey,
       })
       .signers([ALLOWED_WALLET]);
@@ -134,18 +134,18 @@ describe("4.- Check permissions", () => {
     // Allowed to Read (Applied to all via wildcard)
     await PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: READ_PERM.resource,
         permission: READ_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: await role_pda(READ_PERM.role, null), // Null address represents the wildcard "*"
-        solCerberusRule: readRulePDA,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: walletSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: await role_pda(READ_PERM.role, null), // Null address represents the wildcard "*"
+        solGatewayRule: readRulePDA,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: walletSeedPDA,
         signer: ALLOWED_WALLET.publicKey,
       })
       .signers([ALLOWED_WALLET])
@@ -175,18 +175,18 @@ describe("4.- Check permissions", () => {
     );
     await PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: WRITE_PERM.resource,
         permission: WRITE_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: rolePDA,
-        solCerberusRule: writeRulePDA,
-        solCerberusToken: tokenPDA,
-        solCerberusMetadata: metadataPDA,
-        solCerberusSeed: WalletWithNFTSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: rolePDA,
+        solGatewayRule: writeRulePDA,
+        solGatewayToken: tokenPDA,
+        solGatewayMetadata: metadataPDA,
+        solGatewaySeed: WalletWithNFTSeedPDA,
         signer: WALLET_WITH_NFTS.publicKey,
       })
       .signers([WALLET_WITH_NFTS])
@@ -195,18 +195,18 @@ describe("4.- Check permissions", () => {
     // Allowed to Read (Applied to all via wildcard)
     await PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: READ_PERM.resource,
         permission: READ_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: await role_pda(READ_PERM.role, null), // Null address represents the wildcard "*"
-        solCerberusRule: readRulePDA,
-        solCerberusToken: tokenPDA,
-        solCerberusMetadata: metadataPDA,
-        solCerberusSeed: WalletWithNFTSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: await role_pda(READ_PERM.role, null), // Null address represents the wildcard "*"
+        solGatewayRule: readRulePDA,
+        solGatewayToken: tokenPDA,
+        solGatewayMetadata: metadataPDA,
+        solGatewaySeed: WalletWithNFTSeedPDA,
         signer: WALLET_WITH_NFTS.publicKey,
       })
       .signers([WALLET_WITH_NFTS])
@@ -226,18 +226,18 @@ describe("4.- Check permissions", () => {
     try {
       await PROGRAM.methods
         .allowed({
-          appId: APP_ID,
+          fileId: FILE_ID,
           namespace: namespaces.Rule,
           resource: WRITE_PERM.resource,
           permission: WRITE_PERM.permission,
         })
         .accounts({
-          solCerberusApp: appPDA,
-          solCerberusRule: writeRulePDA,
-          solCerberusRole: rolePDA,
-          solCerberusToken: tokenPDA,
-          solCerberusMetadata: metadataPDA,
-          solCerberusSeed: WalletWithNFTSeedPDA,
+          solGatewayFile: filePDA,
+          solGatewayRule: writeRulePDA,
+          solGatewayRole: rolePDA,
+          solGatewayToken: tokenPDA,
+          solGatewayMetadata: metadataPDA,
+          solGatewaySeed: WalletWithNFTSeedPDA,
           signer: WALLET_WITH_NFTS.publicKey,
         })
         .signers([WALLET_WITH_NFTS])
@@ -267,18 +267,18 @@ describe("4.- Check permissions", () => {
     );
     await PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: WRITE_PERM.resource,
         permission: WRITE_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: rolePDA,
-        solCerberusRule: writeRulePDA,
-        solCerberusToken: tokenPDA,
-        solCerberusMetadata: metadataPDA,
-        solCerberusSeed: WalletWithNFTSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: rolePDA,
+        solGatewayRule: writeRulePDA,
+        solGatewayToken: tokenPDA,
+        solGatewayMetadata: metadataPDA,
+        solGatewaySeed: WalletWithNFTSeedPDA,
         signer: WALLET_WITH_NFTS.publicKey,
       })
       .signers([WALLET_WITH_NFTS])
@@ -287,18 +287,18 @@ describe("4.- Check permissions", () => {
     // Allowed to Read (Applied to all via wildcard)
     await PROGRAM.methods
       .allowed({
-        appId: APP_ID,
+        fileId: FILE_ID,
         namespace: namespaces.Rule,
         resource: READ_PERM.resource,
         permission: READ_PERM.permission,
       })
       .accounts({
-        solCerberusApp: appPDA,
-        solCerberusRole: await role_pda(READ_PERM.role, null), // Null address represents the wildcard "*"
-        solCerberusRule: readRulePDA,
-        solCerberusToken: tokenPDA,
-        solCerberusMetadata: metadataPDA,
-        solCerberusSeed: WalletWithNFTSeedPDA,
+        solGatewayFile: filePDA,
+        solGatewayRole: await role_pda(READ_PERM.role, null), // Null address represents the wildcard "*"
+        solGatewayRule: readRulePDA,
+        solGatewayToken: tokenPDA,
+        solGatewayMetadata: metadataPDA,
+        solGatewaySeed: WalletWithNFTSeedPDA,
         signer: WALLET_WITH_NFTS.publicKey,
       })
       .signers([WALLET_WITH_NFTS])
