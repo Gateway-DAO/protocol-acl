@@ -18,15 +18,15 @@ pub mod sol_gateway {
 
     use super::*;
 
-    pub fn initialize_files(ctx: Context<InitializeFiles>, app_data: AppData) -> Result<()> {
-        instructions::initialize_files::initialize_files(ctx, app_data)
+    pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> Result<()> {
+        instructions::initialize_files::initialize_files(ctx, file_data)
     }
 
-    pub fn update_file(ctx: Context<UpdateApp>, app_data: UpdateAppData) -> Result<()> {
-        instructions::update_file::update_file(ctx, app_data)
+    pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Result<()> {
+        instructions::update_file::update_file(ctx, file_data)
     }
 
-    pub fn delete_file(ctx: Context<DeleteApp>) -> Result<()> {
+    pub fn delete_file(ctx: Context<DeleteFile>) -> Result<()> {
         instructions::delete_file::delete_file(ctx)
     }
 
@@ -61,7 +61,7 @@ pub mod sol_gateway {
     pub fn allowed(ctx: Context<Allowed>, allowed_rule: AllowedRule) -> Result<()> {
         instructions::allowed::allowed(
             &ctx.accounts.signer,
-            &ctx.accounts.sol_gateway_app,
+            &ctx.accounts.sol_gateway_file,
             &ctx.accounts.sol_gateway_role,
             &ctx.accounts.sol_gateway_rule,
             &ctx.accounts.sol_gateway_token,

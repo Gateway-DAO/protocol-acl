@@ -3,7 +3,7 @@ use crate::instructions::allowed::{allowed, AllowedRule};
 use crate::utils::{valid_rules, utc_now, validate_ns_permission, roles::address_or_wildcard};
 use crate::state::role::Role;
 use anchor_lang::prelude::*;
-use crate::state::app::{App, Seed};
+use crate::state::file::{File, Seed};
 use crate::state::rule::*;
 use crate::Errors;
 use crate::metadata_program;
@@ -27,16 +27,16 @@ pub struct AddRule<'info> {
         init,
         payer = signer,
         space = 111,
-        seeds = [rule_data.namespace.to_le_bytes().as_ref(), rule_data.role.as_ref(), rule_data.resource.as_ref(), rule_data.permission.as_ref(), sol_gateway_app.id.key().as_ref()], 
+        seeds = [rule_data.namespace.to_le_bytes().as_ref(), rule_data.role.as_ref(), rule_data.resource.as_ref(), rule_data.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
         constraint = valid_rules(&rule_data.role, &rule_data.resource, &rule_data.permission)  @ Errors::InvalidRule,
         bump
     )]
     pub rule: Account<'info, Rule>,
     #[account(
-        seeds = [b"app".as_ref(), sol_gateway_app.id.key().as_ref()],
-        bump = sol_gateway_app.bump,
+        seeds = [b"file".as_ref(), sol_gateway_file.id.key().as_ref()],
+        bump = sol_gateway_file.bump,
     )]
-    pub sol_gateway_app: Box<Account<'info, App>>,
+    pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
         seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
@@ -48,7 +48,7 @@ pub struct AddRule<'info> {
     )]
     pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.role.as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.app_id.key().as_ref()],
+        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.role.as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
         bump = sol_gateway_rule2.bump,
     )]
     pub sol_gateway_rule2: Option<Box<Account<'info, Rule>>>,
@@ -78,7 +78,7 @@ pub fn add_rule(
     // Checks if is allowed to add a rule for this specific Namespace and Role.
     allowed(
         &ctx.accounts.signer,
-        &ctx.accounts.sol_gateway_app,
+        &ctx.accounts.sol_gateway_file,
         &ctx.accounts.sol_gateway_role,
         &ctx.accounts.sol_gateway_rule,
         &ctx.accounts.sol_gateway_token,
@@ -86,7 +86,7 @@ pub fn add_rule(
         &mut ctx.accounts.sol_gateway_seed,
         &ctx.accounts.system_program,
         AllowedRule {
-            app_id: ctx.accounts.sol_gateway_app.id.key(),
+            file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleNSRole as u8,
             resource: data.namespace.to_string(),
             permission: data.role.to_string(),
@@ -95,7 +95,7 @@ pub fn add_rule(
     // // Checks if is allowed to add a rule for this specific Resource and Permission.
     allowed(
         &ctx.accounts.signer,
-        &ctx.accounts.sol_gateway_app,
+        &ctx.accounts.sol_gateway_file,
         &ctx.accounts.sol_gateway_role,
         &ctx.accounts.sol_gateway_rule2,
         &ctx.accounts.sol_gateway_token,
@@ -103,7 +103,7 @@ pub fn add_rule(
         &mut ctx.accounts.sol_gateway_seed,
         &ctx.accounts.system_program,
         AllowedRule {
-            app_id: ctx.accounts.sol_gateway_app.id.key(),
+            file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleResourcePerm as u8,
             resource: data.resource.to_string(),
             permission: data.permission.to_string(),
@@ -126,7 +126,7 @@ pub fn add_rule(
     // Add permission
     let rule = &mut ctx.accounts.rule;
     rule.bump = ctx.bumps.rule;
-    rule.app_id = ctx.accounts.sol_gateway_app.id;
+    rule.file_id = ctx.accounts.sol_gateway_file.id;
     rule.namespace = data.namespace;
     rule.role = data.role;
     rule.resource = data.resource;
@@ -134,7 +134,7 @@ pub fn add_rule(
     rule.expires_at = data.expires_at;
     emit!(RulesChanged {
         time: utc_now(),
-        app_id: ctx.accounts.sol_gateway_app.id,
+        file_id: ctx.accounts.sol_gateway_file.id,
     });
     Ok(())
 }

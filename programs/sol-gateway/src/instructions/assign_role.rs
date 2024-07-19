@@ -1,6 +1,6 @@
 use crate::instructions::allowed::{allowed, AllowedRule};
 use crate::metadata_program;
-use crate::state::app::{App, Seed};
+use crate::state::file::{File, Seed};
 use crate::state::role::*;
 use crate::state::rule::{Namespaces, Rule};
 use crate::utils::{roles::address_or_wildcard, rules::*, utc_now};
@@ -26,16 +26,16 @@ pub struct AssignRole<'info> {
         init,
         payer = signer,
         space = 105,
-        seeds = [assign_role_data.role.as_ref(), address_or_wildcard(&assign_role_data.address), sol_gateway_app.id.key().as_ref()],
+        seeds = [assign_role_data.role.as_ref(), address_or_wildcard(&assign_role_data.address), sol_gateway_file.id.key().as_ref()],
         constraint = valid_rule(&assign_role_data.role, true)  @ InvalidRole,
         bump
     )]
     pub role: Account<'info, Role>,
     #[account(
-        seeds = [b"app".as_ref(), sol_gateway_app.id.key().as_ref()],
-        bump = sol_gateway_app.bump,
+        seeds = [b"file".as_ref(), sol_gateway_file.id.key().as_ref()],
+        bump = sol_gateway_file.bump,
     )]
-    pub sol_gateway_app: Box<Account<'info, App>>,
+    pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
         seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
@@ -68,7 +68,7 @@ pub struct AssignRole<'info> {
 pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
     allowed(
         &ctx.accounts.signer,
-        &ctx.accounts.sol_gateway_app,
+        &ctx.accounts.sol_gateway_file,
         &ctx.accounts.sol_gateway_role,
         &ctx.accounts.sol_gateway_rule,
         &ctx.accounts.sol_gateway_token,
@@ -76,7 +76,7 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
         &mut ctx.accounts.sol_gateway_seed,
         &ctx.accounts.system_program,
         AllowedRule {
-            app_id: ctx.accounts.sol_gateway_app.id.key(),
+            file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AssignRole as u8,
             resource: assign_role_data.address_type.to_string(),
             permission: assign_role_data.role.clone(),
@@ -85,14 +85,14 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
 
     let role = &mut ctx.accounts.role;
     role.bump = ctx.bumps.role;
-    role.app_id = ctx.accounts.sol_gateway_app.id;
+    role.file_id = ctx.accounts.sol_gateway_file.id;
     role.address = assign_role_data.address;
     role.role = assign_role_data.role;
     role.address_type = assign_role_data.address_type;
     role.expires_at = assign_role_data.expires_at;
     emit!(RolesChanged {
         time: utc_now(),
-        app_id: ctx.accounts.sol_gateway_app.id,
+        file_id: ctx.accounts.sol_gateway_file.id,
     });
     Ok(())
 }

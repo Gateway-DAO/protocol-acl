@@ -17,7 +17,7 @@ use anchor_lang::prelude::*;
 // + 1 bump
 // total = 8 + 32  + 32 + 1 + 32 + 4 + 16 + 8 + 8 + 1 + 1 + 8 + 1 + 1 + 8 + 1 = 162
 #[derive(Accounts)]
-#[instruction(app_data: AppData)]
+#[instruction(file_data: FileData)]
 pub struct InitializeFiles<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -25,29 +25,29 @@ pub struct InitializeFiles<'info> {
         init,
         payer = authority,
         space = 162,
-        seeds = [b"app".as_ref(), app_data.id.key().as_ref()], 
+        seeds = [b"file".as_ref(), file_data.id.key().as_ref()], 
         bump
     )]
-    pub app: Box<Account<'info, App>>,
+    pub app: Box<Account<'info, File>>,
     pub system_program: Program<'info, System>,
 }
 
-pub fn initialize_files(ctx: Context<InitializeFiles>, app_data: AppData) -> Result<()> {
+pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> Result<()> {
     let app = &mut ctx.accounts.app;
-    app.id = app_data.id;
+    app.id = file_data.id;
     app.account_type = AccountTypes::Basic as u8;
     app.authority = ctx.accounts.authority.key();
-    app.recovery = app_data.recovery;
-    app.name = validate_string_len(&app_data.name, 0, 16)?;
+    app.recovery = file_data.recovery;
+    app.name = validate_string_len(&file_data.name, 0, 16)?;
     app.fee = None;
-    app.cached = app_data.cached;
+    app.cached = file_data.cached;
     app.rules_updated_at = utc_now();
     app.roles_updated_at = app.rules_updated_at;
     app.expires_at = None;
     app.bump = ctx.bumps.app;
-    emit!(AppChanged {
+    emit!(FileChanged {
         time: app.rules_updated_at,
-        app_id: ctx.accounts.app.id,
+        file_id: ctx.accounts.app.id,
         authority: ctx.accounts.app.authority,
     });
     Ok(())

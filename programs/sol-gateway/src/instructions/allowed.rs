@@ -1,5 +1,5 @@
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
-use crate::state::{App, Seed};
+use crate::state::{File, Seed};
 use crate::state::rule::Rule;
 use crate::utils::{allowed_perm, utc_now, address_or_wildcard, allowed_authority, get_fee, subtract_rent_exemption_from_fee};
 use crate::state::role::Role;
@@ -13,28 +13,28 @@ pub struct Allowed<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
     #[account(
-        seeds = [b"app".as_ref(), sol_gateway_app.id.key().as_ref()], 
-        bump = sol_gateway_app.bump,
+        seeds = [b"file".as_ref(), sol_gateway_file.id.key().as_ref()], 
+        bump = sol_gateway_file.bump,
     )]
-    pub sol_gateway_app: Box<Account<'info, App>>,
+    pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
         seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()], 
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option< Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.app_id.key().as_ref()], 
+        seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()], 
         bump = sol_gateway_role.bump
     )]
-    pub sol_cerberus_role: Option< Box<Account<'info, Role>>>,
+    pub sol_gateway_role: Option< Box<Account<'info, Role>>>,
     #[account()]
-    pub sol_cerberus_token: Option< Box<Account<'info, TokenAccount>>>,
+    pub sol_gateway_token: Option< Box<Account<'info, TokenAccount>>>,
     #[account(
-        seeds = [b"metadata", metadata_program::ID.as_ref(), sol_cerberus_metadata.mint.key().as_ref()],
+        seeds = [b"metadata", metadata_program::ID.as_ref(), sol_gateway_metadata.mint.key().as_ref()],
         seeds::program = metadata_program::ID,
         bump,
     )]
-    pub sol_cerberus_metadata: Option< Box<Account<'info, MetadataAccount>>>,
+    pub sol_gateway_metadata: Option< Box<Account<'info, MetadataAccount>>>,
     #[account(
         init_if_needed,
         payer = signer,
@@ -42,13 +42,13 @@ pub struct Allowed<'info> {
         seeds = [b"seed".as_ref(), signer.key.as_ref()],
         bump
     )]
-    pub sol_cerberus_seed: Option<Account<'info, Seed>>,
+    pub sol_gateway_seed: Option<Account<'info, Seed>>,
     pub system_program: Program<'info, System>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct AllowedRule {
-    pub app_id: Pubkey,
+    pub file_id: Pubkey,
     pub namespace: u8,
     pub resource: String,
     pub permission: String,
@@ -57,7 +57,7 @@ pub struct AllowedRule {
 
 pub fn allowed<'info>(
     signer: &Signer<'info>,
-    app: &Box<Account<'info, App>>,
+    file: &Box<Account<'info, File>>,
     role: &Option<Box<Account<'info, Role>>>,
     rule: &Option<Box<Account<'info, Rule>>>,
     token: &Option<Box<Account<'info, TokenAccount>>>,
@@ -66,16 +66,16 @@ pub fn allowed<'info>(
     system_program: &Program<'info, anchor_lang::system_program::System>,
     allowed_rule: AllowedRule) -> Result<()> {
     // The APP ID must be the one authorized by the program
-    if allowed_rule.app_id != app.id.key(){
+    if allowed_rule.file_id != file.id.key(){
         return Err(error!(InvalidAppID))
     }
     
     // APP Authority is always allowed (No fees)
-    if allowed_authority(&signer.key(), &app.authority.key()){
+    if allowed_authority(&signer.key(), &file.authority.key()){
         return Ok(());
     }
 
-    let mut fee:  u64 = get_fee(app);
+    let mut fee:  u64 = get_fee(file);
     // Seed account is mandatory when Fee is defined and using normal "Rule"
     if fee > 0 && seed.is_none() {
         return Err(error!(MissingSeedAccount))
@@ -100,7 +100,7 @@ pub fn allowed<'info>(
     let role = role.as_ref().unwrap();
 
     // The APP ID must match on: APP, Role, Rule
-    if app.id != rule.app_id  || app.id != role.app_id{
+    if file.id != rule.file_id  || file.id != role.file_id{
         return Err(error!(Unauthorized))
     }
 

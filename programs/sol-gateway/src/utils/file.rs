@@ -1,20 +1,20 @@
-use crate::App;
+use crate::File;
 use crate::Errors;
 use crate::FEE;
 use crate::PROGRAM_AUTHORITY;
 use anchor_lang::prelude::*;
 
-pub fn allowed_authority(authority: &Pubkey, app_authority: &Pubkey) -> bool {
-    return authority.key() == app_authority.key() || authority.key() == PROGRAM_AUTHORITY.key();
+pub fn allowed_authority(authority: &Pubkey, file_authority: &Pubkey) -> bool {
+    return authority.key() == file_authority.key() || authority.key() == PROGRAM_AUTHORITY.key();
 }
 
 /// Gets the default fee applied to each "Allowed" request
-pub fn get_fee(app: &App) -> u64 {
+pub fn get_fee(file: &File) -> u64 {
     if FEE.is_none() {
         return 0;
     }
-    if app.fee.is_some() {
-        return app.fee.unwrap();
+    if file.fee.is_some() {
+        return file.fee.unwrap();
     }
     FEE.unwrap()
 }
@@ -66,7 +66,7 @@ mod tests {
     }
     #[test]
     fn test_get_fee() {
-        let mut app = App {
+        let mut file = File {
             id: pubkey!("6kJuLfs8BrKwxy28FCmcPfp4d5stv4Sr6YgV15A6s7FK"),
             authority: pubkey!("6kJuLfs8BrKwxy28FCmcPfp4d5stv4Sr6YgV15A6s7FK"),
             recovery: None, // Only recovery or authority accounts can update the App Authority.
@@ -79,9 +79,9 @@ mod tests {
             account_type: AccountTypes::Basic as u8,
             expires_at: None,
         };
-        assert_eq!(get_fee(&app), if FEE.is_some() { FEE.unwrap() } else { 0 });
-        app.fee = Some(10);
-        assert_eq!(get_fee(&app), 10);
+        assert_eq!(get_fee(&file), if FEE.is_some() { FEE.unwrap() } else { 0 });
+        file.fee = Some(10);
+        assert_eq!(get_fee(&file), 10);
     }
 
     #[test]

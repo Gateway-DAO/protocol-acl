@@ -1759,9 +1759,19 @@ version = "0.1.12"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "sol-gateway-macros",
  "solana-program",
  "toml_datetime",
  "winnow",
+]
+
+[[package]]
+name = "sol-gateway-macros"
+version = "0.1.10"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.71",
 ]
 
 [[package]]

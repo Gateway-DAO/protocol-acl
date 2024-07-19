@@ -92,7 +92,7 @@ pub fn sol_gateway_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> T
     if let syn::Fields::Named(ref mut fields) = new_fields {
         fields.named.push(parse_field(quote! {
             /// CHECK: Validated on CPI call
-            pub sol_gateway_app: UncheckedAccount<#lifetime>
+            pub sol_gateway_file: UncheckedAccount<#lifetime>
         }));
         fields.named.push(parse_field(quote! {
             /// CHECK: Validated on CPI call
