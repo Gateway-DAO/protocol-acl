@@ -1,11 +1,11 @@
 import * as anchor from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { APP_ID, METADATA_PROGRAM_ID, PROGRAM, PROVIDER } from "./constants";
+import { FILE_ID, METADATA_PROGRAM_ID, PROGRAM, PROVIDER } from "./constants";
 
 export async function app_pda() {
   return (
     await PublicKey.findProgramAddressSync(
-      [anchor.utils.bytes.utf8.encode("app"), APP_ID.toBuffer()],
+      [anchor.utils.bytes.utf8.encode("app"), FILE_ID.toBuffer()],
       PROGRAM.programId
     )
   )[0];
@@ -24,7 +24,7 @@ export async function rule_pda(
         anchor.utils.bytes.utf8.encode(role),
         anchor.utils.bytes.utf8.encode(resource),
         anchor.utils.bytes.utf8.encode(permission),
-        APP_ID.toBuffer(),
+        FILE_ID.toBuffer(),
       ],
       PROGRAM.programId
     )
@@ -49,7 +49,7 @@ export async function role_pda(role, address: PublicKey | null) {
       [
         anchor.utils.bytes.utf8.encode(role),
         address ? address.toBuffer() : anchor.utils.bytes.utf8.encode("*"),
-        APP_ID.toBuffer(),
+        FILE_ID.toBuffer(),
       ],
       PROGRAM.programId
     )
