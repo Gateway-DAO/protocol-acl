@@ -1,16 +1,16 @@
 import { expect } from "chai";
 import { app_pda, WRITE_PERM, rule_pda, READ_PERM } from "./common";
-import { APP_ID, PROGRAM, PROVIDER, namespaces } from "./constants";
+import { FILE_ID, PROGRAM, PROVIDER, namespaces } from "./constants";
 
 describe("2.- Rules", () => {
-  let appPDA = null; // Populated on before() block
+  let filePDA = null; // Populated on before() block
   const role1 = "Admin";
   const resource1 = "Admin";
   const permission1 = "*";
   let rule1PDA = null; // Populated on before() block
 
   before(async () => {
-    appPDA = await app_pda();
+    filePDA = await file_pda();
     rule1PDA = await rule_pda(role1, resource1, permission1);
   });
 
@@ -31,13 +31,13 @@ describe("2.- Rules", () => {
         })
         .accounts({
           rule: rule1PDA,
-          solCerberusApp: appPDA,
-          solCerberusRole: null,
-          solCerberusRule: null,
-          solCerberusRule2: null,
-          solCerberusToken: null,
-          solCerberusMetadata: null,
-          solCerberusSeed: null,
+          solGatewayFile: filePDA,
+          solGatewayRole: null,
+          solGatewayRule: null,
+          solGatewayRule2: null,
+          solGatewayToken: null,
+          solGatewayMetadata: null,
+          solGatewaySeed: null,
         })
         .rpc();
       // Break infinite loop in case it fails:
@@ -67,13 +67,13 @@ describe("2.- Rules", () => {
           WRITE_PERM.resource,
           WRITE_PERM.permission
         ),
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusRule2: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayRule2: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
 
@@ -92,13 +92,13 @@ describe("2.- Rules", () => {
           READ_PERM.resource,
           READ_PERM.permission
         ),
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusRule2: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayRule2: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
   });
@@ -109,13 +109,13 @@ describe("2.- Rules", () => {
       .accounts({
         rule: rule1PDA,
         collector: PROVIDER.wallet.publicKey,
-        solCerberusApp: appPDA,
-        solCerberusRole: null,
-        solCerberusRule: null,
-        solCerberusRule2: null,
-        solCerberusToken: null,
-        solCerberusMetadata: null,
-        solCerberusSeed: null,
+        solGatewayFile: filePDA,
+        solGatewayRole: null,
+        solGatewayRule: null,
+        solGatewayRule2: null,
+        solGatewayToken: null,
+        solGatewayMetadata: null,
+        solGatewaySeed: null,
       })
       .rpc();
     try {
