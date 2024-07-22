@@ -19,7 +19,7 @@ describe("3.- Assign roles", () => {
   it("Assign role to File", async () => {
     const rolePDA = await role_pda(
       WRITE_PERM.role,
-      NFTS.allowedNFT.mintAddress
+      PROVIDER.wallet.publicKey
     );
     const oneHourLater = Math.floor(new Date().getTime() / 1000) + 60 * 60;
     let listener = null;
@@ -30,14 +30,14 @@ describe("3.- Assign roles", () => {
       });
       PROGRAM.methods
         .assignRole({
-          address: NFTS.allowedNFT.mintAddress,
+          address: PROVIDER.wallet.publicKey,
           role: WRITE_PERM.role,
-          addressType: addressType.Nft,
+          addressType: addressType.Wallet,
           expiresAt: new BN(oneHourLater),
         })
         .accounts({
           role: rolePDA,
-          solGatewayFile: appPDA,
+          solGatewayFile: filePDA,
           solGatewayRole: null,
           solGatewayRule: null,
           solGatewayToken: null,
@@ -56,7 +56,7 @@ describe("3.- Assign roles", () => {
       NFTS.allowedNFT.mintAddress.toBase58()
     );
     expect(role.role).to.equal(WRITE_PERM.role);
-    expect(role.addressType).to.deep.equal(addressType.Nft);
+    expect(role.addressType).to.deep.equal(addressType.Wallet);
     expect(role.expiresAt.toNumber()).to.equal(oneHourLater);
   });
 
@@ -67,9 +67,9 @@ describe("3.- Assign roles", () => {
     );
     await PROGRAM.methods
       .assignRole({
-        address: NFTS.allowedCollection.nft.collection.address,
+        address: PROVIDER.wallet.publicKey,
         role: WRITE_PERM.role,
-        addressType: addressType.Collection,
+        addressType: addressType.Wallet,
         expiresAt: null,
       })
       .accounts({
