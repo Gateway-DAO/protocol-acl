@@ -16,7 +16,7 @@ describe("3.- Assign roles", () => {
     filePDA = await file_pda();
   });
 
-  it("Assign role to NFT", async () => {
+  it("Assign role to File", async () => {
     const rolePDA = await role_pda(
       WRITE_PERM.role,
       NFTS.allowedNFT.mintAddress
