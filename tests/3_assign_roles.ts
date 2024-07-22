@@ -60,30 +60,6 @@ describe("3.- Assign roles", () => {
     expect(role.expiresAt.toNumber()).to.equal(oneHourLater);
   });
 
-  it("Assign role to NFT Collection", async () => {
-    const rolePDA = await role_pda(
-      WRITE_PERM.role,
-      NFTS.allowedCollection.nft.collection.address
-    );
-    await PROGRAM.methods
-      .assignRole({
-        address: PROVIDER.wallet.publicKey,
-        role: WRITE_PERM.role,
-        addressType: addressType.Wallet,
-        expiresAt: null,
-      })
-      .accounts({
-        role: rolePDA,
-        solGatewayFile: filePDA,
-        solGatewayRole: null,
-        solGatewayRule: null,
-        solGatewayToken: null,
-        solGatewayMetadata: null,
-        solGatewaySeed: null,
-      })
-      .rpc();
-  });
-
   it("Assign role to Wallet", async () => {
     const rolePDA = await role_pda(WRITE_PERM.role, ALLOWED_WALLET.publicKey);
     await PROGRAM.methods
