@@ -1,4 +1,4 @@
-1. clone contents from mpl-token-metadata github: solana 
+1. clone contents from mpl-token-metadata github:(https://github.com/metaplex-foundation/mpl-token-metadata)
 2. copy into deps directory
 3. execute make commmand in root directory
 4. run solana-test-validator -r in a seperate session
