@@ -1,43 +1,33 @@
 import * as anchor from "@project-serum/anchor";
 import { expect, assert } from "chai";
-import { app_pda, safe_airdrop } from "./common";
+import { file_pda, safe_airdrop } from "./common";
 import {
   FILE_ID,
-  NFTS,
   PROVIDER,
   RECOVERY_KEYPAIR,
   METAPLEX,
   PROGRAM,
   PROVIDER_WALLET,
-  WALLET_WITH_NFTS,
   ALLOWED_WALLET,
   ANOTHER_WALLET,
   accountTypes,
 } from "./constants";
 
-describe("1.- Initialize APP", () => {
+describe("1.- Initialize FILE", () => {
   let filePDA = null; // Populated on before() block
   const unauthorized_keypair = anchor.web3.Keypair.generate();
 
   // Create NFTs for testing access rules afterwards.
   before(async () => {
-    appPDA = await app_pda();
-    PROVIDER.connection.requestAirdrop(
-      WALLET_WITH_NFTS.publicKey,
-      1_000_000_000 // 1SOL
-    );
+    filePDA = await file_pda();
+    
     // Async airdrop for wallet user
     safe_airdrop(
       PROVIDER.connection,
       ALLOWED_WALLET.publicKey,
       2 * anchor.web3.LAMPORTS_PER_SOL // 2 SOL
     );
-    // Async airdrop for wallet with NFT user
-    safe_airdrop(
-      PROVIDER.connection,
-      WALLET_WITH_NFTS.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL // 2 SOL
-    );
+    
     // Async airdrop for another wallet user
     safe_airdrop(
       PROVIDER.connection,
@@ -49,36 +39,7 @@ describe("1.- Initialize APP", () => {
       PROVIDER.wallet.publicKey,
       2 * anchor.web3.LAMPORTS_PER_SOL // 2 SOL
     );
-    const collection = await METAPLEX.nfts().create({
-      name: "Collection",
-      sellerFeeBasisPoints: 0,
-      uri: "https://arweave.net/collection1-hash",
-      isMutable: true,
-      isCollection: true,
-    });
-    NFTS["allowedNFT"] = await METAPLEX.nfts().create({
-      name: "Allowed NFT",
-      sellerFeeBasisPoints: 0,
-      uri: "https://arweave.net/nft1-hash",
-      tokenOwner: WALLET_WITH_NFTS.publicKey,
-      isMutable: true,
-    });
-    NFTS["allowedCollection"] = await METAPLEX.nfts().create({
-      name: "Allowed collection",
-      sellerFeeBasisPoints: 0,
-      uri: "https://arweave.net/nft2-hash",
-      tokenOwner: WALLET_WITH_NFTS.publicKey,
-      isMutable: true,
-      collection: collection.mintAddress,
-      collectionAuthority: PROVIDER_WALLET.payer, // This will set the Collection verified flag to true
-    });
-    NFTS["notAllowedNFT"] = await METAPLEX.nfts().create({
-      name: "Not allowed NFT",
-      sellerFeeBasisPoints: 0,
-      uri: "https://arweave.net/nft3-hash",
-      tokenOwner: WALLET_WITH_NFTS.publicKey,
-      isMutable: true,
-    });
+    
   });
 
   it("Init", async () => {
