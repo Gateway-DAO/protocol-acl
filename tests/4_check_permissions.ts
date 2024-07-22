@@ -162,7 +162,4 @@ describe("4.- Check permissions", () => {
         .toNumber()
     ).to.equal(FEE);
   });
-
-  
-  });
 });
