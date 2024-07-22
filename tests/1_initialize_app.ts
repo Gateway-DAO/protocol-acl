@@ -45,12 +45,12 @@ describe("1.- Initialize FILE", () => {
   it("Init", async () => {
     const fileName = "test";
     try {
-      await PROGRAM.account.app.fetch(filePDA);
+      await PROGRAM.account.file.fetch(filePDA);
     } catch (_err) {
       expect(_err.toString()).to.include("Account does not exist");
     }
     const tx = await PROGRAM.methods
-      .initializeFile({
+      .initializeFiles({
         id: FILE_ID,
         recovery: RECOVERY_KEYPAIR.publicKey,
         name: fileName,
