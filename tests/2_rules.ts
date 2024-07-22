@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { app_pda, WRITE_PERM, rule_pda, READ_PERM } from "./common";
+import { file_pda, WRITE_PERM, rule_pda, READ_PERM } from "./common";
 import { FILE_ID, PROGRAM, PROVIDER, namespaces } from "./constants";
 
 describe("2.- Rules", () => {
@@ -46,8 +46,8 @@ describe("2.- Rules", () => {
       }, 2000);
     });
     let rule = await PROGRAM.account.rule.fetch(rule1PDA);
-    expect(rule.appId.toBase58()).to.equal(APP_ID.toBase58());
-    expect(rule.appId.toBase58()).to.equal(event.appId.toBase58());
+    expect(rule.fileId.toBase58()).to.equal(FILE_ID.toBase58());
+    expect(rule.fileId.toBase58()).to.equal(event.fileId.toBase58());
     expect(rule.role).to.equal(role1);
     expect(rule.resource).to.equal(resource1);
     expect(rule.permission).to.equal(permission1);
