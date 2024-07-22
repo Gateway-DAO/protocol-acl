@@ -1,5 +1,5 @@
 [package]
-name = "sol-gateway-acl"
+name = "sol-gateway"
 version = "0.1.12"
 description = "A fine grained Role-Based Access Control (RBAC) for enhanced security on Solana programs"
 edition = "2021"
