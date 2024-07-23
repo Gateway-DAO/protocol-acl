@@ -65,12 +65,12 @@ pub fn allowed<'info>(
     seed: &mut Option<Account<'info, Seed>>,
     system_program: &Program<'info, anchor_lang::system_program::System>,
     allowed_rule: AllowedRule) -> Result<()> {
-    // The APP ID must be the one authorized by the program
+    // The FILE ID must be the one authorized by the program
     if allowed_rule.file_id != file.id.key(){
-        return Err(error!(InvalidAppID))
+        return Err(error!(InvalidFileID))
     }
     
-    // APP Authority is always allowed (No fees)
+    // FILE Authority is always allowed (No fees)
     if allowed_authority(&signer.key(), &file.authority.key()){
         return Ok(());
     }
@@ -99,7 +99,7 @@ pub fn allowed<'info>(
     let rule = rule.as_ref().unwrap();
     let role = role.as_ref().unwrap();
 
-    // The APP ID must match on: APP, Role, Rule
+    // The FILE ID must match on: FILE, Role, Rule
     if file.id != rule.file_id  || file.id != role.file_id{
         return Err(error!(Unauthorized))
     }
