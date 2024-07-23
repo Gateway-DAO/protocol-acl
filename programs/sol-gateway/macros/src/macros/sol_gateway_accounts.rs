@@ -136,7 +136,7 @@ pub fn sol_gateway_accounts_macro<'info>(_: TokenStream, item: TokenStream) -> T
                 let cpi_program = self.sol_gateway.to_account_info();
                 let cpi_accounts = sol_gateway::cpi::accounts::Allowed {
                     signer: self.#signer.to_account_info(),
-                    sol_gateway_app: self.sol_gateway_app.to_account_info(),
+                    sol_gateway_file: self.sol_gateway_file.to_account_info(),
                     sol_gateway_rule: match self.sol_gateway_rule.as_ref() {
                         None => None,
                         Some(x) => Some(x.to_account_info()),
