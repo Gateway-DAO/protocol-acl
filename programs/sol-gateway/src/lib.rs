@@ -47,7 +47,7 @@ pub mod sol_gateway {
     }
 
     /**
-     * Updates either app.roles_updated_at or app.rules_updated_at fields, so clients
+     * Updates either file.roles_updated_at or file.rules_updated_at fields, so clients
      * can keep track and cache roles & rules accordingly.
      */
     pub fn update_cache(ctx: Context<UpdateCache>, cache_updated: u8) -> Result<()> {
