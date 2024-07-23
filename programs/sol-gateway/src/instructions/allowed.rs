@@ -5,7 +5,7 @@ use crate::utils::{allowed_perm, utc_now, address_or_wildcard, allowed_authority
 use crate::state::role::Role;
 use crate::metadata_program;
 use anchor_lang::prelude::*;
-use crate::Errors::{Unauthorized, InvalidAppID, MissingSeedAccount};
+use crate::Errors::{Unauthorized, InvalidFileID, MissingSeedAccount};
 
 
 #[derive(Accounts)]
