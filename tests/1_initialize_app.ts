@@ -71,7 +71,7 @@ describe("1.- Initialize FILE", () => {
 
   it("Update authority", async () => {
     try {
-      // Unauthorized users shouldn't be able to update App authority
+      // Unauthorized users shouldn't be able to update File authority
       await PROGRAM.methods
         .updateFile({
           authority: unauthorized_keypair.publicKey,
@@ -83,7 +83,7 @@ describe("1.- Initialize FILE", () => {
           expiresAt: null,
         })
         .accounts({
-          app: filePDA,
+          file: filePDA,
           signer: unauthorized_keypair.publicKey,
         })
         .signers([unauthorized_keypair])
@@ -96,7 +96,7 @@ describe("1.- Initialize FILE", () => {
 // expect((error.toString()).to.equal("UnauthorizedAuthorityUpdate"));
     }
 
-    // Verify current Authority can update the authority of the APP
+    // Verify current Authority can update the authority of the FILE
     await PROGRAM.methods
       .updateFile({
         authority: unauthorized_keypair.publicKey,
@@ -117,7 +117,7 @@ describe("1.- Initialize FILE", () => {
     expect(file.authority.toBase58()).to.equal(
       unauthorized_keypair.publicKey.toBase58()
     );
-    // Verify recovery can also update the authority of the APP
+    // Verify recovery can also update the authority of the FILE
     await PROGRAM.methods
       .updateFile({
         authority: PROVIDER.wallet.publicKey,
