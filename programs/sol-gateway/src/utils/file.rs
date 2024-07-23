@@ -69,7 +69,7 @@ mod tests {
         let mut file = File {
             id: pubkey!("6kJuLfs8BrKwxy28FCmcPfp4d5stv4Sr6YgV15A6s7FK"),
             authority: pubkey!("6kJuLfs8BrKwxy28FCmcPfp4d5stv4Sr6YgV15A6s7FK"),
-            recovery: None, // Only recovery or authority accounts can update the App Authority.
+            recovery: None, // Only recovery or authority accounts can update the File Authority.
             bump: 0,
             name: "test".to_string(),
             roles_updated_at: 0,
