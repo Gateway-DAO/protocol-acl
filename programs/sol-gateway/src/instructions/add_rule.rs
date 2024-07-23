@@ -10,7 +10,7 @@ use crate::metadata_program;
 
 // SPACE SIZE:
 // + 8 discriminator
-// + 32 app_id (Pubkey)
+// + 32 file_id (Pubkey)
 // + 1 namespace (u8)
 // + 4 + 16 role (string)
 // + 4 + 16 resource (string)
