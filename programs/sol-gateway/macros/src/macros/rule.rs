@@ -105,13 +105,13 @@ pub fn rule_macro(args: TokenStream, item: TokenStream) -> TokenStream {
         return proc_macro::TokenStream::from(quote!(#item));
     }
 
-    // Sol Cerberus var defaults:
+    // Sol Gateway var defaults:
     let mut sc_vars: [TokenStream2; 3] = [
-        quote! { SOL_CERBERUS_APP_ID },
+        quote! { SOL_GATEWAY_FILE_ID },
         quote! { #resource },
         quote! { #permission },
     ];
-    // Find Sol Cerberus app ID on the current function scope (when defined)
+    // Find Sol Gateway file ID on the current function scope (when defined)
     extract_sc_local_vars(&mut item.block, &mut sc_vars);
     let sc_file_id: &TokenStream2 = &sc_vars[0];
     let sc_resource: &TokenStream2 = &sc_vars[1];
