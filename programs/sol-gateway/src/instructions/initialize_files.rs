@@ -28,27 +28,27 @@ pub struct InitializeFiles<'info> {
         seeds = [b"file".as_ref(), file_data.id.key().as_ref()], 
         bump
     )]
-    pub app: Box<Account<'info, File>>,
+    pub file: Box<Account<'info, File>>,
     pub system_program: Program<'info, System>,
 }
 
 pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> Result<()> {
-    let app = &mut ctx.accounts.app;
-    app.id = file_data.id;
-    app.account_type = AccountTypes::Basic as u8;
-    app.authority = ctx.accounts.authority.key();
-    app.recovery = file_data.recovery;
-    app.name = validate_string_len(&file_data.name, 0, 16)?;
-    app.fee = None;
-    app.cached = file_data.cached;
-    app.rules_updated_at = utc_now();
-    app.roles_updated_at = app.rules_updated_at;
-    app.expires_at = None;
-    app.bump = ctx.bumps.app;
+    let file = &mut ctx.accounts.file;
+    file.id = file_data.id;
+    file.account_type = AccountTypes::Basic as u8;
+    file.authority = ctx.accounts.authority.key();
+    file.recovery = file_data.recovery;
+    file.name = validate_string_len(&file_data.name, 0, 16)?;
+    file.fee = None;
+    file.cached = file_data.cached;
+    file.rules_updated_at = utc_now();
+    file.roles_updated_at = file.rules_updated_at;
+    file.expires_at = None;
+    file.bump = ctx.bumps.file;
     emit!(FileChanged {
-        time: app.rules_updated_at,
-        file_id: ctx.accounts.app.id,
-        authority: ctx.accounts.app.authority,
+        time: file.rules_updated_at,
+        file_id: ctx.accounts.file.id,
+        authority: ctx.accounts.file.authority,
     });
     Ok(())
 }
