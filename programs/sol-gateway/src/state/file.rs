@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 
 ///  AccountTypes:
-///     0 => Basic  (Apps with default fees)
-///     1 => Free   (Apps with no fees)
+///     0 => Basic  (Files with default fees)
+///     1 => Free   (Files with no fees)
 #[repr(u8)]
 pub enum AccountTypes {
     Basic = 0,
@@ -41,7 +41,7 @@ pub struct UpdateFileData {
 pub struct File {
     pub id: Pubkey,
     pub authority: Pubkey,
-    pub recovery: Option<Pubkey>, // Only recovery or authority accounts can update the App Authority.
+    pub recovery: Option<Pubkey>, // Only recovery or authority accounts can update the File Authority.
     pub bump: u8,
     pub name: String,
     pub roles_updated_at: i64,
