@@ -17,16 +17,16 @@ pub struct UpdateFile<'info> {
 }
 
 pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Result<()> {
-    let app = &mut ctx.accounts.file;
-    app.authority = file_data.authority;
-    app.recovery = file_data.recovery;
-    app.name = validate_string_len(&file_data.name, 0, 16)?;
-    app.account_type =
-        program_authority_field(&file_data.authority, app.account_type, file_data.account_type)?;
-    app.fee = program_authority_field(&file_data.authority, app.fee, file_data.fee)?;
-    app.cached = file_data.cached;
-    app.expires_at =
-        program_authority_field(&file_data.authority, app.expires_at, file_data.expires_at)?;
+    let file = &mut ctx.accounts.file;
+    file.authority = file_data.authority;
+    file.recovery = file_data.recovery;
+    file.name = validate_string_len(&file_data.name, 0, 16)?;
+    file.account_type =
+        program_authority_field(&file_data.authority, file.account_type, file_data.account_type)?;
+    file.fee = program_authority_field(&file_data.authority, file.fee, file_data.fee)?;
+    file.cached = file_data.cached;
+    file.expires_at =
+        program_authority_field(&file_data.authority, file.expires_at, file_data.expires_at)?;
     emit!(FileChanged {
         time: utc_now(),
         file_id: ctx.accounts.file.id,
