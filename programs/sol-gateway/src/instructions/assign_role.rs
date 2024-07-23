@@ -10,7 +10,7 @@ use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 
 // SPACE SIZE:
 // + 8 discriminator
-// + 32 app_id (Pubkey)
+// + 32 file_id (Pubkey)
 // + 1 + 32 address Option<Pubkey>
 // + 4 + 16 role (string)
 // + 1 + 1 address_type
