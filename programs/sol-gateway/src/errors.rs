@@ -15,13 +15,13 @@ pub enum Errors {
     #[msg("The user does not have enough privileges to perform this action")]
     Unauthorized,
     #[msg("The Sol Gateway FILE ID does not match the one defined in the program")]
-    InvalidAppID,
+    InvalidFileID,
     #[msg("Invalid address type, mus be either 'Wallet', 'Nft', 'Collection' or a wildcard '*'")]
     InvalidAddressType,
     #[msg("Invalid namespace, must be either an u8 number (0-255) or a wildcard '*'")]
     InvalidNamespace,
     #[msg("GATEWAY_FILE_ID is missing on lib.rs")]
-    MissingSolCerberusAppId,
+    MissingSolGatewayFileId,
     #[msg("The Gateway Seed account is missing")]
     MissingSeedAccount,
     #[msg("Only program authority can perform this action")]
