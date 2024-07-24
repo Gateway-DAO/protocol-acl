@@ -17,7 +17,7 @@ describe("1.- Initialize FILE", () => {
   let filePDA = null; // Populated on before() block
   const unauthorized_keypair = anchor.web3.Keypair.generate();
 
-  // Create NFTs for testing access rules afterwards.
+  // Create files for testing access rules afterwards.
   before(async () => {
     filePDA = await file_pda();
     
