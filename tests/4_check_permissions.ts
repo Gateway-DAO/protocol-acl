@@ -1,7 +1,6 @@
 import {
   file_pda,
   role_pda,
-  nft_metadata_pda,
   WRITE_PERM,
   rule_pda,
   READ_PERM,
@@ -9,11 +8,9 @@ import {
 } from "./common";
 import {
   FILE_ID,
-  NFTS,
   PROGRAM,
   PROVIDER,
   ALLOWED_WALLET,
-  WALLET_WITH_NFTS,
   namespaces,
   FEE,
 } from "./constants";
@@ -28,7 +25,7 @@ describe("4.- Check permissions", () => {
   let writeRulePDA = null; // Populated on before() block
   let readRulePDA = null; // Populated on before() block
   let walletSeedPDA = null; // Populated on before() block
-  let WalletWithNFTSeedPDA = null; // Populated on before() block
+  
 
   before(async () => {
     filePDA = await file_pda();
@@ -43,7 +40,7 @@ describe("4.- Check permissions", () => {
       READ_PERM.permission
     );
     walletSeedPDA = await seed_pda(ALLOWED_WALLET.publicKey);
-    WalletWithNFTSeedPDA = await seed_pda(WALLET_WITH_NFTS.publicKey);
+   
   });
 
   it("Check allowed Authority", async () => {
