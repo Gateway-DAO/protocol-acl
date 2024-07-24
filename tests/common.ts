@@ -56,18 +56,7 @@ export async function role_pda(role, address: PublicKey | null) {
   )[0];
 }
 
-export async function nft_metadata_pda(mint: PublicKey) {
-  return (
-    await PublicKey.findProgramAddressSync(
-      [
-        anchor.utils.bytes.utf8.encode("metadata"),
-        METADATA_PROGRAM_ID.toBuffer(),
-        mint.toBuffer(),
-      ],
-      METADATA_PROGRAM_ID
-    )
-  )[0];
-}
+
 
 export async function safe_airdrop(
   connection: anchor.web3.Connection,
