@@ -132,14 +132,14 @@ pub fn allowed<'info>(
       if role.address.is_none() || signer.key() == role.address.unwrap(){
             return pay_fee(system_program, signer, seed, fee);
     }
-    // Check if the NFT or Collection Mint addresses are authorized
+    // Check if the file or Collection Mint addresses are authorized
     if token.is_some(){
         let token = token.as_ref().unwrap();
-        // Check if is the real owner of the NFT and has at least one
+        // Check if is the real owner of the file and has at least one
         if token.owner != signer.key() || token.amount <= 0{
             return Err(error!(Unauthorized))
         }
-        // NFT authorized (Address = "None" is considered wildcard "*")
+        // File authorized (Address = "None" is considered wildcard "*")
         if role.address.is_none() || token.mint == role.address.unwrap(){
             return pay_fee(system_program, signer, seed, fee);
         }
