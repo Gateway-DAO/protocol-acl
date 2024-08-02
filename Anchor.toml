@@ -3,13 +3,15 @@ seeds = true
 skip-lint = false
 [programs.localnet]
 sol_gateway = "SCERbrcgSPwgkrJ7j4TABr17dhYzdgiwPZUSSfFPt8x"
+[programs.devnet]
+sol_gateway = "6CvJLL1q7A9vD97jHGtr8EX7LoaPEP51HH2ab2JLUn9m"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
-#cluster = "devnet"
+#cluster = "Localnet"
+cluster = "devnet"
 #cluster = "testnet"
 #cluster = "mainnet"
 wallet = "/home/shailesh/.config/solana/id.json"
