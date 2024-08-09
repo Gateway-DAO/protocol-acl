@@ -1,7 +1,7 @@
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 use crate::instructions::allowed::{allowed, AllowedRule};
 use crate::state::file::{File, Seed};
-use crate::state::role::Role;
+use crate::state::role::Permission;
 use crate::state::rule::*;
 use crate::utils::{utc_now, roles::address_or_wildcard};
 use anchor_lang::prelude::*;
@@ -28,7 +28,7 @@ pub struct DeleteRule<'info> {
         seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
     )]
-    pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
+    pub sol_gateway_role: Option<Box<Account<'info, Permission>>>,
     #[account(
         seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,

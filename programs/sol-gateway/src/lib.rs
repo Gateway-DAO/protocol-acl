@@ -38,7 +38,10 @@ pub mod sol_gateway {
         instructions::delete_rule::delete_rule(ctx)
     }
 
-    pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
+    pub fn assign_role(
+        ctx: Context<AssignRole>,
+        assign_role_data: AssignPermissionData,
+    ) -> Result<()> {
         instructions::assign_role::assign_role(ctx, assign_role_data)
     }
 

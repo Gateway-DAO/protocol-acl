@@ -1,7 +1,7 @@
 use crate::instructions::allowed::{allowed, AllowedRule};
 use crate::metadata_program;
 use crate::state::file::{File, Seed};
-use crate::state::role::{Role, RolesChanged};
+use crate::state::role::{Permission, PermissionsChanged};
 use crate::state::rule::Namespaces;
 use crate::state::rule::Rule;
 use crate::utils::{roles::address_or_wildcard, utc_now};
@@ -18,7 +18,7 @@ pub struct DeleteAssignedRole<'info> {
         seeds = [role.role.as_ref(), address_or_wildcard(&role.address), sol_gateway_file.id.key().as_ref()],
         bump = role.bump,
     )]
-    pub role: Account<'info, Role>,
+    pub role: Account<'info, Permission>,
     #[account(
         seeds = [b"file".as_ref(), sol_gateway_file.id.key().as_ref()],
         bump = sol_gateway_file.bump,
@@ -28,7 +28,7 @@ pub struct DeleteAssignedRole<'info> {
         seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
     )]
-    pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
+    pub sol_gateway_role: Option<Box<Account<'info, Permission>>>,
     #[account(
         seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,
@@ -74,7 +74,7 @@ pub fn delete_assigned_role(ctx: Context<DeleteAssignedRole>) -> Result<()> {
         },
     )?;
 
-    emit!(RolesChanged {
+    emit!(PermissionsChanged {
         time: utc_now(),
         file_id: ctx.accounts.sol_gateway_file.id,
     });

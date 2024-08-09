@@ -2,7 +2,7 @@ use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 use crate::state::{File, Seed};
 use crate::state::rule::Rule;
 use crate::utils::{allowed_perm, utc_now, address_or_wildcard, allowed_authority, get_fee, subtract_rent_exemption_from_fee};
-use crate::state::role::Role;
+use crate::state::role::Permission;
 use crate::metadata_program;
 use anchor_lang::prelude::*;
 use crate::Errors::{Unauthorized, InvalidFileID, MissingSeedAccount};
@@ -26,7 +26,7 @@ pub struct Allowed<'info> {
         seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()], 
         bump = sol_gateway_role.bump
     )]
-    pub sol_gateway_role: Option< Box<Account<'info, Role>>>,
+    pub sol_gateway_role: Option< Box<Account<'info, Permission>>>,
     #[account()]
     pub sol_gateway_token: Option< Box<Account<'info, TokenAccount>>>,
     #[account(
@@ -58,7 +58,7 @@ pub struct AllowedRule {
 pub fn allowed<'info>(
     signer: &Signer<'info>,
     file: &Box<Account<'info, File>>,
-    role: &Option<Box<Account<'info, Role>>>,
+    role: &Option<Box<Account<'info, Permission>>>,
     rule: &Option<Box<Account<'info, Rule>>>,
     token: &Option<Box<Account<'info, TokenAccount>>>,
     metadata: &Option<Box<Account<'info, MetadataAccount>>>,
