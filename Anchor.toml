@@ -2,9 +2,9 @@
 seeds = true
 skip-lint = false
 [programs.localnet]
-sol_gateway = "SCERbrcgSPwgkrJ7j4TABr17dhYzdgiwPZUSSfFPt8x"
+sol_gateway = "C6XuRN6Go3ruag1dc7c8BASzTUYfTxmyBw1a5DdKypYC"
 [programs.devnet]
-sol_gateway = "6CvJLL1q7A9vD97jHGtr8EX7LoaPEP51HH2ab2JLUn9m"
+sol_gateway = "C6XuRN6Go3ruag1dc7c8BASzTUYfTxmyBw1a5DdKypYC"
 
 [registry]
 url = "https://api.apr.dev"
@@ -14,7 +14,7 @@ url = "https://api.apr.dev"
 cluster = "devnet"
 #cluster = "testnet"
 #cluster = "mainnet"
-wallet = "/home/shailesh/.config/solana/id.json"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

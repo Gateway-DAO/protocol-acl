@@ -11,10 +11,12 @@ pub mod instructions;
 pub mod state;
 pub mod utils;
 
-declare_id!("SCERbrcgSPwgkrJ7j4TABr17dhYzdgiwPZUSSfFPt8x");
+declare_id!("C6XuRN6Go3ruag1dc7c8BASzTUYfTxmyBw1a5DdKypYC");
 
 #[program]
 pub mod sol_gateway {
+
+    use instruction::AssignPermission;
 
     use super::*;
 
@@ -38,12 +40,15 @@ pub mod sol_gateway {
         instructions::delete_rule::delete_rule(ctx)
     }
 
-    pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
-        instructions::assign_role::assign_role(ctx, assign_role_data)
+    pub fn assign_permission(
+        ctx: Context<AssignPermission>,
+        assign_role_data: AssignPermissionData,
+    ) -> Result<()> {
+        instructions::assign_permission::assign_role(ctx, assign_role_data)
     }
 
-    pub fn delete_assigned_role(ctx: Context<DeleteAssignedRole>) -> Result<()> {
-        instructions::delete_assigned_role::delete_assigned_role(ctx)
+    pub fn delete_assigned_permission(ctx: Context<DeleteAssignedPermission>) -> Result<()> {
+        instructions::delete_assigned_permission::delete_assigned_role(ctx)
     }
 
     /**

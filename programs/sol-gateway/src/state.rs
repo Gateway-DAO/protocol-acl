@@ -1,7 +1,7 @@
 pub use file::*;
-pub use role::*;
+pub use permission::*;
 pub use rule::*;
 
 pub mod file;
-pub mod role;
+pub mod permission;
 pub mod rule;

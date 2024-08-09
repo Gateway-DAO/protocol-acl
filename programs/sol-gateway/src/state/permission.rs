@@ -11,7 +11,7 @@ impl AddressType {
     pub fn to_string(&self) -> String {
         match self {
             AddressType::Wallet => "Wallet",
-            // AddressType::Nft => "Nft",            
+            // AddressType::Nft => "Nft",
             AddressType::Collection => "Collection",
         }
         .to_string()
@@ -19,7 +19,7 @@ impl AddressType {
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Debug)]
-pub struct AssignRoleData {
+pub struct AssignPermissionData {
     pub address: Option<Pubkey>,
     pub role: String,
     pub address_type: AddressType,
@@ -27,7 +27,7 @@ pub struct AssignRoleData {
 }
 
 #[account]
-pub struct Role {
+pub struct Permission {
     pub file_id: Pubkey,
     pub address: Option<Pubkey>,
     pub role: String,
@@ -37,7 +37,7 @@ pub struct Role {
 }
 
 #[event]
-pub struct RolesChanged {
+pub struct PermissionsChanged {
     pub time: i64,
     #[index]
     pub file_id: Pubkey,
