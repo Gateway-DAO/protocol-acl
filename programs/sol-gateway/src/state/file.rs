@@ -1,3 +1,4 @@
+use crate::state::metadata::*;
 use anchor_lang::prelude::*;
 
 ///  AccountTypes:
@@ -24,6 +25,7 @@ pub struct FileData {
     pub recovery: Option<Pubkey>,
     pub name: String,
     pub cached: bool,
+    pub metadata: Option<Vec<Metadata>>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Debug)]
