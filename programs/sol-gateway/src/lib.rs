@@ -30,6 +30,14 @@ pub mod sol_gateway {
         instructions::delete_file::delete_file(ctx)
     }
 
+    pub fn update_file_metadata(
+        ctx: Context<UpdateFileMetadata>,
+        file_id: Pubkey,
+        new_metadata: Vec<Metadata>,
+    ) -> Result<()> {
+        instructions::update_metadata::update_file_metadata(ctx, file_id, new_metadata)
+    }
+
     pub fn add_rule(ctx: Context<AddRule>, rule_data: RuleData) -> Result<()> {
         instructions::add_rule::add_rule(ctx, rule_data)
     }

@@ -31,8 +31,9 @@ pub struct FileMetadata {
  */
 
 #[event]
-pub struct MetadataChanged {
+pub struct MetadataUpdated {
     pub time: i64,
     #[index]
-    pub metadata_id: Pubkey,
+    pub file_id: Pubkey,
+    pub authority: Pubkey,
 }
