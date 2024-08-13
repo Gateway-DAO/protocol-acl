@@ -18,8 +18,8 @@ pub struct UpdateCache<'info> {
 pub fn update_cache(ctx: Context<UpdateCache>, cache_updated: u8) -> Result<()> {
     let file = &mut ctx.accounts.file;
     let now = utc_now();
-    if cache_updated == CacheUpdated::Roles as u8 {
-        file.roles_updated_at = now;
+    if cache_updated == CacheUpdated::Permissions as u8 {
+        file.permissions_updated_at = now;
     } else {
         file.rules_updated_at = now;
     }

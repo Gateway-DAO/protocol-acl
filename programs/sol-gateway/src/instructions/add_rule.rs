@@ -111,7 +111,7 @@ pub fn add_rule(
     )?;
 
     // Validate AddressType when creating "AssignRole" or "DeleteAssignRole" rules (Resource can only be Wallet, Nft, Collection or wildcard "*")
-    if data.namespace >= Namespaces::AssignRole as u8 && data.namespace <= Namespaces::DeleteAssignRole as u8 {
+    if data.namespace >= Namespaces::AssignPermission as u8 && data.namespace <= Namespaces::DeleteAssignPermission as u8 {
         if !matches!(data.resource.as_str(), "Wallet" | "Nft" | "Collection" | "*") {
                 return Err(error!(Errors::InvalidAddressType))
         }

@@ -1,5 +1,5 @@
-use crate::File;
 use crate::Errors;
+use crate::File;
 use crate::FEE;
 use crate::PROGRAM_AUTHORITY;
 use anchor_lang::prelude::*;
@@ -72,7 +72,7 @@ mod tests {
             recovery: None, // Only recovery or authority accounts can update the File Authority.
             bump: 0,
             name: "test".to_string(),
-            roles_updated_at: 0,
+            permissions_updated_at: 0,
             rules_updated_at: 0,
             cached: false,
             fee: None,

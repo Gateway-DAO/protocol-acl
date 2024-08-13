@@ -42,7 +42,7 @@ pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> R
     file.fee = None;
     file.cached = file_data.cached;
     file.rules_updated_at = utc_now();
-    file.roles_updated_at = file.rules_updated_at;
+    file.permissions_updated_at = file.rules_updated_at;
     file.expires_at = None;
     file.bump = ctx.bumps.file;
     emit!(FileChanged {

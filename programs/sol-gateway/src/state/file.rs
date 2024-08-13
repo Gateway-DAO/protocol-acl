@@ -10,11 +10,11 @@ pub enum AccountTypes {
 }
 
 ///  CacheUpdated:
-///     0 => Roles (When roles change)
+///     0 => Permissions (When permissions change)
 ///     1 => Rules   (When rules change)
 #[repr(u8)]
 pub enum CacheUpdated {
-    Roles = 0,
+    Permissions = 0,
     Rules = 1,
 }
 
@@ -44,7 +44,7 @@ pub struct File {
     pub recovery: Option<Pubkey>, // Only recovery or authority accounts can update the File Authority.
     pub bump: u8,
     pub name: String,
-    pub roles_updated_at: i64,
+    pub permissions_updated_at: i64,
     pub rules_updated_at: i64,
     pub cached: bool,
     pub fee: Option<u64>,

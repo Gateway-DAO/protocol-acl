@@ -38,15 +38,15 @@ pub mod sol_gateway {
         instructions::delete_rule::delete_rule(ctx)
     }
 
-    pub fn assign_role(
+    pub fn assign_permission(
         ctx: Context<AssignRole>,
         assign_role_data: AssignPermissionData,
     ) -> Result<()> {
-        instructions::assign_role::assign_role(ctx, assign_role_data)
+        instructions::assign_permission::assign_permission(ctx, assign_role_data)
     }
 
-    pub fn delete_assigned_role(ctx: Context<DeleteAssignedRole>) -> Result<()> {
-        instructions::delete_assigned_role::delete_assigned_role(ctx)
+    pub fn delete_assigned_permission(ctx: Context<DeleteAssignedPermission>) -> Result<()> {
+        instructions::delete_assigned_permission::delete_assigned_permission(ctx)
     }
 
     /**

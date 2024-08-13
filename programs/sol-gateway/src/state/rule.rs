@@ -20,8 +20,8 @@ pub struct RuleData {
 #[repr(u8)]
 pub enum Namespaces {
     Rule = 0,
-    AssignRole = 1,
-    DeleteAssignRole = 2,
+    AssignPermission = 1,
+    DeleteAssignPermission = 2,
     AddRuleNSRole = 3,
     AddRuleResourcePerm = 4,
     DeleteRuleNSRole = 5,

@@ -1,19 +1,19 @@
 pub use add_rule::*;
 pub use allowed::*;
-pub use assign_role::*;
+pub use assign_permission::*;
+pub use delete_assigned_permission::*;
 pub use delete_file::*;
-pub use delete_assigned_role::*;
 pub use delete_rule::*;
 pub use initialize_files::*;
-pub use update_file::*;
 pub use update_cache::*;
+pub use update_file::*;
 
 pub mod add_rule;
 pub mod allowed;
-pub mod assign_role;
+pub mod assign_permission;
+pub mod delete_assigned_permission;
 pub mod delete_file;
-pub mod delete_assigned_role;
 pub mod delete_rule;
 pub mod initialize_files;
-pub mod update_file;
 pub mod update_cache;
+pub mod update_file;
