@@ -32,4 +32,8 @@ pub enum Errors {
     InvalidFileId,
     #[msg("Unauthorized metadata update")]
     UnauthorizedMetadataUpdate,
+    #[msg("The provided file metadata account was not found")]
+    FileMetadataAccountNotFound,
+    #[msg("Metadata account provided when no metadata was expected")]
+    UnexpectedMetadataAccount,
 }

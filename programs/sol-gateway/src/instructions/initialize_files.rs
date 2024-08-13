@@ -1,6 +1,6 @@
 use crate::utils::utc_now;
-use crate::FileMetadata;
 use crate::{state::file::*, utils::validate_string_len};
+use crate::{Errors, FileMetadata};
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
@@ -21,7 +21,7 @@ pub struct InitializeFiles<'info> {
         payer = authority,
         space = 8 + 32 + 4 + (32 * 10),
         seeds = [b"metadata".as_ref(), file_data.id.key().as_ref()],
-        bump
+        bump,
     )]
     pub file_metadata: Option<Account<'info, FileMetadata>>,
     pub system_program: Program<'info, System>,
@@ -42,11 +42,20 @@ pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> R
     file.bump = ctx.bumps.file;
 
     // Initialize metadata if provided
-    if let Some(metadata) = file_data.metadata {
-        if let Some(file_metadata) = &mut ctx.accounts.file_metadata {
+    match (file_data.metadata, &mut ctx.accounts.file_metadata) {
+        (Some(metadata), Some(file_metadata)) => {
             file_metadata.file_id = file.id;
             file_metadata.metadata = metadata;
             file_metadata.bump = ctx.bumps.file_metadata;
+        }
+        (Some(_), None) => {
+            return err!(Errors::FileMetadataAccountNotFound);
+        }
+        (None, Some(_)) => {
+            return err!(Errors::UnexpectedMetadataAccount);
+        }
+        (None, None) => {
+            // No metadata provided and no metadata account
         }
     }
 
