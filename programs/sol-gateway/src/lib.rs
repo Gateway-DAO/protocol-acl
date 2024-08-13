@@ -32,10 +32,9 @@ pub mod sol_gateway {
 
     pub fn update_file_metadata(
         ctx: Context<UpdateFileMetadata>,
-        file_id: Pubkey,
-        new_metadata: Vec<Metadata>,
+        metadata_data: MetadataData,
     ) -> Result<()> {
-        instructions::update_metadata::update_file_metadata(ctx, file_id, new_metadata)
+        instructions::update_metadata::update_file_metadata(ctx, metadata_data)
     }
 
     pub fn add_rule(ctx: Context<AddRule>, rule_data: RuleData) -> Result<()> {

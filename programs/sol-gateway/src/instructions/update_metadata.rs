@@ -1,5 +1,5 @@
 use crate::{
-    state::file::*, utils::allowed_authority, Errors, FileMetadata, Metadata, MetadataUpdated,
+    state::file::*, utils::allowed_authority, Errors, FileMetadata, MetadataData, MetadataUpdated,
 };
 use anchor_lang::prelude::*;
 
@@ -23,8 +23,7 @@ pub struct UpdateFileMetadata<'info> {
 
 pub fn update_file_metadata(
     ctx: Context<UpdateFileMetadata>,
-    file_id: Pubkey,
-    new_metadata: Vec<Metadata>,
+    metadata_data: MetadataData,
 ) -> Result<()> {
     let file = &ctx.accounts.file;
     let file_metadata = &mut ctx.accounts.file_metadata;
@@ -34,11 +33,11 @@ pub fn update_file_metadata(
         Errors::UnauthorizedMetadataUpdate
     );
 
-    file_metadata.metadata = new_metadata;
+    file_metadata.metadata = metadata_data.metadata;
 
     emit!(MetadataUpdated {
         time: Clock::get()?.unix_timestamp,
-        file_id,
+        file_id: file.id,
         authority: ctx.accounts.file.authority,
     });
 
