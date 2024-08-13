@@ -2,10 +2,19 @@ import * as anchor from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { FILE_ID, METADATA_PROGRAM_ID, PROGRAM, PROVIDER } from "./constants";
 
-export async function file_pda() {
+export async function file_pda(fileId: PublicKey = FILE_ID) {
   return (
     await PublicKey.findProgramAddressSync(
-      [anchor.utils.bytes.utf8.encode("file"), FILE_ID.toBuffer()],
+      [anchor.utils.bytes.utf8.encode("file"), fileId.toBuffer()],
+      PROGRAM.programId
+    )
+  )[0];
+}
+
+export async function metadata_pda(fileId: PublicKey) {
+  return (
+    await PublicKey.findProgramAddressSync(
+      [anchor.utils.bytes.utf8.encode("metadata"), fileId.toBuffer()],
       PROGRAM.programId
     )
   )[0];
@@ -55,8 +64,6 @@ export async function role_pda(role, address: PublicKey | null) {
     )
   )[0];
 }
-
-
 
 export async function safe_airdrop(
   connection: anchor.web3.Connection,
