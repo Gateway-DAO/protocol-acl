@@ -20,20 +20,11 @@ no-log-ix-name = []
 cpi = ["no-entrypoint"]
 
 [dependencies]
+ahash = "=0.8.6"
 sol-gateway-macros = { path = "./macros", version = "0.1.9" }
 anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.29.0", features = ["metadata"] }
 #anchor-spl = { git = "https://github.com/coral-xyz/anchor" }
-solana-program = "=1.16.20"
+solana-program = "=1.17.0"
 winnow = "=0.4.1"
 toml_datetime = "=0.6.1"
-
-# Cannot be compiled using Solana 1.16.x until issue is solved: 
-# https://github.com/solana-labs/solana/issues/31960
-# and until mpl-token-metadata crate is updated:
-# https://github.com/coral-xyz/anchor/pull/2527
-
-# Workaround requirements:
-# https://github.com/coral-xyz/anchor/issues/2548#issuecomment-1609418578
-# cargo update -p solana-zk-token-sdk --precise 1.14.19
-# cargo update -p borsh@0.10.3 --precise 0.9.3
