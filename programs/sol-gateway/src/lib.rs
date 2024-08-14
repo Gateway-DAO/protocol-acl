@@ -11,7 +11,7 @@ pub mod instructions;
 pub mod state;
 pub mod utils;
 
-declare_id!("SCERbrcgSPwgkrJ7j4TABr17dhYzdgiwPZUSSfFPt8x");
+declare_id!("C8TANLzc5UKGQBzhmKjrs7nAB326zxoBFtJ9x48C5S6Z");
 
 #[program]
 pub mod sol_gateway {
@@ -28,6 +28,13 @@ pub mod sol_gateway {
 
     pub fn delete_file(ctx: Context<DeleteFile>) -> Result<()> {
         instructions::delete_file::delete_file(ctx)
+    }
+
+    pub fn update_file_metadata(
+        ctx: Context<UpdateFileMetadata>,
+        metadata_data: MetadataData,
+    ) -> Result<()> {
+        instructions::update_metadata::update_file_metadata(ctx, metadata_data)
     }
 
     pub fn add_rule(ctx: Context<AddRule>, rule_data: RuleData) -> Result<()> {

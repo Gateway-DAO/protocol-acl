@@ -1,82 +1,127 @@
 import * as anchor from "@project-serum/anchor";
 import { expect, assert } from "chai";
-import { file_pda, safe_airdrop } from "./common";
+import { file_pda, safe_airdrop, metadata_pda } from "./common";
 import {
   FILE_ID,
   PROVIDER,
   RECOVERY_KEYPAIR,
-  METAPLEX,
   PROGRAM,
-  PROVIDER_WALLET,
   ALLOWED_WALLET,
   ANOTHER_WALLET,
   accountTypes,
 } from "./constants";
 
-describe("1.- Initialize FILE", () => {
-  let filePDA = null; // Populated on before() block
+describe("1.- Initialize FILE and Metadata", () => {
+  let filePDA = null;
+  let metadataPDA = null;
   const unauthorized_keypair = anchor.web3.Keypair.generate();
 
-  // Create files for testing access rules afterwards.
   before(async () => {
     filePDA = await file_pda();
-    
-    // Async airdrop for wallet user
-    safe_airdrop(
-      PROVIDER.connection,
-      ALLOWED_WALLET.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL // 2 SOL
-    );
-    
-    // Async airdrop for another wallet user
-    safe_airdrop(
-      PROVIDER.connection,
-      ANOTHER_WALLET.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL // 2 SOL
-    );
-    await safe_airdrop(
-      PROVIDER.connection,
-      PROVIDER.wallet.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL // 2 SOL
-    );
-    
+    metadataPDA = await metadata_pda(FILE_ID);
+
+    // Airdrop to wallets
+    await Promise.all([
+      safe_airdrop(
+        PROVIDER.connection,
+        ALLOWED_WALLET.publicKey,
+        2 * anchor.web3.LAMPORTS_PER_SOL
+      ),
+      safe_airdrop(
+        PROVIDER.connection,
+        ANOTHER_WALLET.publicKey,
+        2 * anchor.web3.LAMPORTS_PER_SOL
+      ),
+      safe_airdrop(
+        PROVIDER.connection,
+        PROVIDER.wallet.publicKey,
+        2 * anchor.web3.LAMPORTS_PER_SOL
+      ),
+    ]);
   });
 
-  it("Init", async () => {
-    const fileName = "test";
-    try {
-      await PROGRAM.account.file.fetch(filePDA);
-    } catch (_err) {
-      // expect(_err.toString()).to.include("Account does not exist");
-      console.log(_err.toString());
-    }
+  it("Init file without metadata", async () => {
+    const fileName = "file1";
+
     const tx = await PROGRAM.methods
       .initializeFiles({
         id: FILE_ID,
         recovery: RECOVERY_KEYPAIR.publicKey,
         name: fileName,
         cached: false,
+        metadata: null,
       })
       .accounts({
         file: filePDA,
+        fileMetadata: null, // Note: here we NEED to pass null or else the program will try to create a metadata account
       })
       .rpc();
+
     let file = await PROGRAM.account.file.fetch(filePDA);
+
     expect(file.id.toBase58()).to.equal(FILE_ID.toBase58());
     expect(file.authority.toBase58()).to.equal(
       PROVIDER.wallet.publicKey.toBase58()
     );
     expect(file.name).to.equal(fileName);
+
+    // Verify metadata account doesn't exist
+    try {
+      await PROGRAM.account.fileMetadata.fetch(metadataPDA);
+      assert.fail("Metadata account should not exist");
+    } catch (error) {
+      expect(error.toString()).to.include(
+        "Account does not exist or has no data"
+      );
+    }
   });
 
-  it("Update authority", async () => {
+  it("Init file with metadata", async () => {
+    const newFileId = anchor.web3.Keypair.generate().publicKey;
+    const newFilePDA = await file_pda(newFileId);
+    const newMetadataPDA = await metadata_pda(newFileId);
+    const fileName = "file2";
+
+    const tx = await PROGRAM.methods
+      .initializeFiles({
+        id: newFileId,
+        recovery: RECOVERY_KEYPAIR.publicKey,
+        name: fileName,
+        cached: false,
+        metadata: [
+          { key: "author", value: "John Doe" },
+          { key: "version", value: "1.0" },
+        ],
+      })
+      .accounts({
+        file: newFilePDA,
+        fileMetadata: newMetadataPDA,
+      })
+      .rpc();
+
+    let file = await PROGRAM.account.file.fetch(newFilePDA);
+    let metadata = await PROGRAM.account.fileMetadata.fetch(newMetadataPDA);
+
+    expect(file.id.toBase58()).to.equal(newFileId.toBase58());
+    expect(file.authority.toBase58()).to.equal(
+      PROVIDER.wallet.publicKey.toBase58()
+    );
+    expect(file.name).to.equal(fileName);
+
+    expect(metadata.fileId.toBase58()).to.equal(newFileId.toBase58());
+    expect(metadata.metadata).to.deep.equal([
+      { key: "author", value: "John Doe" },
+      { key: "version", value: "1.0" },
+    ]);
+  });
+
+  it("Update file authority", async () => {
     try {
-      // Unauthorized users shouldn't be able to update File authority
       await PROGRAM.methods
         .updateFile({
           authority: unauthorized_keypair.publicKey,
           recovery: RECOVERY_KEYPAIR.publicKey,
-          name: "myfile-recovered",
+          name: "file1",
           cached: false,
           fee: null,
           accountType: accountTypes.Basic,
@@ -88,12 +133,11 @@ describe("1.- Initialize FILE", () => {
         })
         .signers([unauthorized_keypair])
         .rpc();
-      //throw new Error(
-       // "Unauthorized users shouldn't be able to update File authority!"
-     // );
+      assert.fail(
+        "Unauthorized users shouldn't be able to update File authority!"
+      );
     } catch (error) {
-      // console.log(error.toString());     
-// expect((error.toString()).to.equal("UnauthorizedAuthorityUpdate"));
+      expect(error.toString()).to.include("UnauthorizedAuthorityUpdate");
     }
 
     // Verify current Authority can update the authority of the FILE
@@ -101,7 +145,7 @@ describe("1.- Initialize FILE", () => {
       .updateFile({
         authority: unauthorized_keypair.publicKey,
         recovery: RECOVERY_KEYPAIR.publicKey,
-        name: "myfile-recovered1",
+        name: "file1",
         cached: true,
         fee: null,
         accountType: accountTypes.Basic,
@@ -112,17 +156,18 @@ describe("1.- Initialize FILE", () => {
       })
       .rpc();
     let file = await PROGRAM.account.file.fetch(filePDA);
-    expect(file.name).to.equal("myfile-recovered1");
+    expect(file.name).to.equal("file1");
     assert.isTrue(file.cached);
     expect(file.authority.toBase58()).to.equal(
       unauthorized_keypair.publicKey.toBase58()
     );
+
     // Verify recovery can also update the authority of the FILE
     await PROGRAM.methods
       .updateFile({
         authority: PROVIDER.wallet.publicKey,
         recovery: RECOVERY_KEYPAIR.publicKey,
-        name: "myfile-recovered2",
+        name: "file2",
         cached: false,
         fee: null,
         accountType: accountTypes.Basic,
@@ -135,10 +180,57 @@ describe("1.- Initialize FILE", () => {
       .signers([RECOVERY_KEYPAIR])
       .rpc();
     file = await PROGRAM.account.file.fetch(filePDA);
-    expect(file.name).to.equal("myfile-recovered2");
+    expect(file.name).to.equal("file2");
     assert.isFalse(file.cached);
     expect(file.authority.toBase58()).to.equal(
       PROVIDER.wallet.publicKey.toBase58()
     );
+  });
+
+  it("Update file metadata", async () => {
+    const fileId = anchor.web3.Keypair.generate().publicKey;
+    const filePDA = await file_pda(fileId);
+    const metadataPDA = await metadata_pda(fileId);
+
+    // Initialize file with metadata
+    await PROGRAM.methods
+      .initializeFiles({
+        id: fileId,
+        recovery: RECOVERY_KEYPAIR.publicKey,
+        name: "file1",
+        cached: false,
+        metadata: [
+          { key: "author", value: "John Doe" },
+          { key: "version", value: "1.0" },
+        ],
+      })
+      .accounts({
+        file: filePDA,
+        fileMetadata: metadataPDA,
+      })
+      .rpc();
+
+    // Update metadata
+    await PROGRAM.methods
+      .updateFileMetadata({
+        metadata: [
+          { key: "author", value: "Jane Doe" },
+          { key: "version", value: "2.0" },
+          { key: "status", value: "updated" },
+        ],
+      })
+      .accounts({
+        file: filePDA,
+        fileMetadata: metadataPDA,
+        signer: PROVIDER.wallet.publicKey,
+      })
+      .rpc();
+
+    let metadata = await PROGRAM.account.fileMetadata.fetch(metadataPDA);
+    expect(metadata.metadata).to.deep.equal([
+      { key: "author", value: "Jane Doe" },
+      { key: "version", value: "2.0" },
+      { key: "status", value: "updated" },
+    ]);
   });
 });

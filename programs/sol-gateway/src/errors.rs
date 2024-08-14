@@ -28,4 +28,12 @@ pub enum Errors {
     UnauthorizedProgramAuthority,
     #[msg("Insufficient funds for transaction")]
     InsufficientFunds,
+    #[msg("The provided file ID does not match the metadata account")]
+    InvalidFileId,
+    #[msg("Unauthorized metadata update")]
+    UnauthorizedMetadataUpdate,
+    #[msg("The provided file metadata account was not found")]
+    FileMetadataAccountNotFound,
+    #[msg("Metadata account provided when no metadata was expected")]
+    UnexpectedMetadataAccount,
 }
