@@ -26,6 +26,10 @@ pub struct FileMetadata {
     pub bump: u8,
 }
 
+impl FileMetadata {
+    pub const MAX_SIZE: usize = 8 + 32 + 4 + (32 * 10);
+}
+
 /**
  * Events
  */
