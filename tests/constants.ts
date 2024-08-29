@@ -21,9 +21,8 @@ export const WALLET_WITH_NFTS: anchor.web3.Keypair =
 export const ANOTHER_WALLET: anchor.web3.Keypair =
   anchor.web3.Keypair.generate();
 
-export const FILE_ID = new anchor.web3.PublicKey(
-  "k39mmqs9rEJ6BMvSF84yw91qnRBXKEBJbeQnZVX7NC3"
-);
+export const FILE_ID = anchor.web3.Keypair.generate().publicKey;
+
 export const RECOVERY_KEYPAIR = anchor.web3.Keypair.generate();
 export const METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
