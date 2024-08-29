@@ -21,12 +21,22 @@ pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Resul
     file.authority = file_data.authority;
     file.recovery = file_data.recovery;
     file.name = validate_string_len(&file_data.name, 0, 16)?;
-    file.account_type =
-        program_authority_field(&file_data.authority, file.account_type, file_data.account_type)?;
+    file.account_type = program_authority_field(
+        &file_data.authority,
+        file.account_type,
+        file_data.account_type,
+    )?;
     file.fee = program_authority_field(&file_data.authority, file.fee, file_data.fee)?;
     file.cached = file_data.cached;
+    file.size = program_authority_field(&file_data.authority, file.size, file_data.size)?;
+    file.checksum = program_authority_field(
+        &file_data.authority,
+        file.checksum.clone(),
+        file_data.checksum,
+    )?;
     file.expires_at =
         program_authority_field(&file_data.authority, file.expires_at, file_data.expires_at)?;
+
     emit!(FileChanged {
         time: utc_now(),
         file_id: ctx.accounts.file.id,

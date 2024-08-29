@@ -11,7 +11,7 @@ pub struct InitializeFiles<'info> {
     #[account(
         init,
         payer = authority,
-        space = 162,
+        space = File::MAX_SIZE,
         seeds = [b"file".as_ref(), file_data.id.key().as_ref()], 
         bump
     )]
@@ -19,7 +19,7 @@ pub struct InitializeFiles<'info> {
     #[account(
         init_if_needed,
         payer = authority,
-        space = 8 + 32 + 4 + (32 * 10),
+        space = FileMetadata::MAX_SIZE,
         seeds = [b"metadata".as_ref(), file_data.id.key().as_ref()],
         bump,
     )]
@@ -35,6 +35,8 @@ pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> R
     file.recovery = file_data.recovery;
     file.name = validate_string_len(&file_data.name, 0, 16)?;
     file.fee = None;
+    file.size = file_data.size;
+    file.checksum = validate_string_len(&file_data.checksum, 0, 32)?;
     file.cached = file_data.cached;
     file.rules_updated_at = utc_now();
     file.roles_updated_at = file.rules_updated_at;

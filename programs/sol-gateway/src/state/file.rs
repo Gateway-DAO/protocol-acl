@@ -37,7 +37,7 @@ pub struct UpdateFileData {
     pub name: String,
     pub cached: bool,
     pub fee: Option<u64>,
-    pub size: u64,
+    pub size: Option<u64>,
     pub checksum: String,
     pub account_type: u8,
     pub expires_at: Option<i64>,

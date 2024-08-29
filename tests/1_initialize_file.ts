@@ -49,6 +49,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         recovery: RECOVERY_KEYPAIR.publicKey,
         name: fileName,
         cached: false,
+        size: new anchor.BN(1073741824), // 1 GB
+        checksum: "351101afcc166d0be1299d55bdfa61a4",
         metadata: null,
       })
       .accounts({
@@ -88,6 +90,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         recovery: RECOVERY_KEYPAIR.publicKey,
         name: fileName,
         cached: false,
+        size: new anchor.BN(1073741824), // 1 GB
+        checksum: "351101afcc166d0be1299d55bdfa61a4",
         metadata: [
           { key: "author", value: "John Doe" },
           { key: "version", value: "1.0" },
@@ -124,6 +128,8 @@ describe("1.- Initialize FILE and Metadata", () => {
           name: "file1",
           cached: false,
           fee: null,
+          size: new anchor.BN(1073741824), // 1 GB
+          checksum: "351101afcc166d0be1299d55bdfa61a4",
           accountType: accountTypes.Basic,
           expiresAt: null,
         })
@@ -148,6 +154,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         name: "file1",
         cached: true,
         fee: null,
+        size: new anchor.BN(1073741824), // 1 GB
+        checksum: "351101afcc166d0be1299d55bdfa61a4",
         accountType: accountTypes.Basic,
         expiresAt: null,
       })
@@ -170,6 +178,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         name: "file2",
         cached: false,
         fee: null,
+        size: new anchor.BN(1073741824), // 1 GB
+        checksum: "351101afcc166d0be1299d55bdfa61a4",
         accountType: accountTypes.Basic,
         expiresAt: null,
       })
@@ -199,6 +209,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         recovery: RECOVERY_KEYPAIR.publicKey,
         name: "file1",
         cached: false,
+        size: new anchor.BN(1073741824), // 1 GB
+        checksum: "351101afcc166d0be1299d55bdfa61a4",
         metadata: [
           { key: "author", value: "John Doe" },
           { key: "version", value: "1.0" },
@@ -232,5 +244,45 @@ describe("1.- Initialize FILE and Metadata", () => {
       { key: "version", value: "2.0" },
       { key: "status", value: "updated" },
     ]);
+  });
+
+  it("Delete file", async () => {
+    const fileIdToDelete = anchor.web3.Keypair.generate().publicKey;
+    const filePDAToDelete = await file_pda(fileIdToDelete);
+
+    await PROGRAM.methods
+      .initializeFiles({
+        id: fileIdToDelete,
+        recovery: RECOVERY_KEYPAIR.publicKey,
+        name: "file_del",
+        cached: false,
+        size: new anchor.BN(1048576), // 1 MB
+        checksum: "123456789abcdef0123456789abcdef0",
+        metadata: null
+      })
+      .accounts({
+        file: filePDAToDelete,
+        fileMetadata: null,
+      })
+      .rpc();
+
+    let file = await PROGRAM.account.file.fetch(filePDAToDelete);
+    expect(file.name).to.equal("file_del");
+
+    await PROGRAM.methods
+      .deleteFile()
+      .accounts({
+        file: filePDAToDelete,
+        authority: PROVIDER.wallet.publicKey,
+        collector: PROVIDER.wallet.publicKey,
+      })
+      .rpc();
+
+    try {
+      await PROGRAM.account.file.fetch(filePDAToDelete);
+      assert.fail("The file was not deleted");
+    } catch (erro) {
+      expect(erro.message).to.include("Account does not exist");
+    }
   });
 });
