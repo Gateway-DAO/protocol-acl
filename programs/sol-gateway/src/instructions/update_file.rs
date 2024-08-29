@@ -28,7 +28,11 @@ pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Resul
     )?;
     file.fee = program_authority_field(&file_data.authority, file.fee, file_data.fee)?;
     file.cached = file_data.cached;
-    file.size = program_authority_field(&file_data.authority, file.size, file_data.size)?;
+    file.size = program_authority_field(
+        &file_data.authority,
+        file.size,
+        file_data.size.unwrap_or(file.size),
+    )?;
     file.checksum = program_authority_field(
         &file_data.authority,
         file.checksum.clone(),
