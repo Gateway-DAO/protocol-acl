@@ -25,6 +25,8 @@ pub struct FileData {
     pub recovery: Option<Pubkey>,
     pub name: String,
     pub cached: bool,
+    pub size: u64,
+    pub checksum: String,
     pub metadata: Option<Vec<Metadata>>,
 }
 
@@ -35,6 +37,8 @@ pub struct UpdateFileData {
     pub name: String,
     pub cached: bool,
     pub fee: Option<u64>,
+    pub size: u64,
+    pub checksum: String,
     pub account_type: u8,
     pub expires_at: Option<i64>,
 }
@@ -50,8 +54,14 @@ pub struct File {
     pub rules_updated_at: i64,
     pub cached: bool,
     pub fee: Option<u64>,
+    pub size: u64,
+    pub checksum: String,
     pub account_type: u8,
     pub expires_at: Option<i64>,
+}
+
+impl File {
+    pub const MAX_SIZE: usize = 162 + 8 + 4 + 32;
 }
 
 #[event]
