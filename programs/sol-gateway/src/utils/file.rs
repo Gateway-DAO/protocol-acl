@@ -1,5 +1,5 @@
-use crate::File;
 use crate::Errors;
+use crate::File;
 use crate::FEE;
 use crate::PROGRAM_AUTHORITY;
 use anchor_lang::prelude::*;
@@ -76,6 +76,8 @@ mod tests {
             rules_updated_at: 0,
             cached: false,
             fee: None,
+            size: 0,
+            checksum: "test".to_string(),
             account_type: AccountTypes::Basic as u8,
             expires_at: None,
         };
