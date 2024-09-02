@@ -61,7 +61,7 @@ describe("5.- Allow assign roles", () => {
           solGatewayToken: null,
           solGatewayMetadata: null,
           solGatewaySeed: allowedWalletSeedPDA,
-          signer: ALLOWED_WALLET.publicKey,
+          contributor: ALLOWED_WALLET.publicKey,
         })
         .signers([ALLOWED_WALLET])
         .rpc();
@@ -118,7 +118,7 @@ describe("5.- Allow assign roles", () => {
         solGatewayToken: null,
         solGatewayMetadata: null,
         solGatewaySeed: allowedWalletSeedPDA,
-        signer: ALLOWED_WALLET.publicKey,
+        contributor: ALLOWED_WALLET.publicKey,
       })
       .signers([ALLOWED_WALLET])
       .rpc();
