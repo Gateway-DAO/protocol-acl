@@ -7,23 +7,29 @@ use anchor_lang::prelude::*;
 #[instruction(file_data: FileData)]
 pub struct InitializeFiles<'info> {
     #[account(mut)]
-    pub authority: Signer<'info>,
+    pub contributor: Signer<'info>,
+
     #[account(
-        init,
-        payer = authority,
+        init_if_needed,
+        payer = rent_payer,
         space = File::MAX_SIZE,
         seeds = [b"file".as_ref(), file_data.id.key().as_ref()], 
         bump
     )]
     pub file: Box<Account<'info, File>>,
+
     #[account(
         init_if_needed,
-        payer = authority,
+        payer = rent_payer,
         space = FileMetadata::MAX_SIZE,
         seeds = [b"metadata".as_ref(), file_data.id.key().as_ref()],
         bump,
     )]
     pub file_metadata: Option<Account<'info, FileMetadata>>,
+
+    #[account(mut)]
+    pub rent_payer: Signer<'info>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -31,7 +37,7 @@ pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> R
     let file = &mut ctx.accounts.file;
     file.id = file_data.id;
     file.account_type = AccountTypes::Basic as u8;
-    file.authority = ctx.accounts.authority.key();
+    file.authority = ctx.accounts.contributor.key();
     file.recovery = file_data.recovery;
     file.name = validate_string_len(&file_data.name, 0, 16)?;
     file.fee = None;
