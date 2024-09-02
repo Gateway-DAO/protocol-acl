@@ -40,7 +40,7 @@ pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> R
     file.cached = file_data.cached;
     file.rules_updated_at = utc_now();
     file.roles_updated_at = file.rules_updated_at;
-    file.expires_at = None;
+    file.expires_at = file_data.expires_at;
     file.bump = ctx.bumps.file;
 
     // Initialize metadata if provided

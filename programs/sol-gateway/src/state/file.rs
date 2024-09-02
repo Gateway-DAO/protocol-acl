@@ -27,6 +27,7 @@ pub struct FileData {
     pub cached: bool,
     pub size: u64,
     pub checksum: String,
+    pub expires_at: i64,
     pub metadata: Option<Vec<Metadata>>,
 }
 
@@ -40,14 +41,14 @@ pub struct UpdateFileData {
     pub size: Option<u64>,
     pub checksum: String,
     pub account_type: u8,
-    pub expires_at: Option<i64>,
+    pub expires_at: i64,
 }
 
 #[account]
 pub struct File {
     pub id: Pubkey,
     pub authority: Pubkey,
-    pub recovery: Option<Pubkey>, // Only recovery or authority accounts can update the File Authority.
+    pub recovery: Option<Pubkey>,
     pub bump: u8,
     pub name: String,
     pub roles_updated_at: i64,
@@ -57,7 +58,7 @@ pub struct File {
     pub size: u64,
     pub checksum: String,
     pub account_type: u8,
-    pub expires_at: Option<i64>,
+    pub expires_at: i64,
 }
 
 impl File {

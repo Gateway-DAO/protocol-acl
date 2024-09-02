@@ -46,12 +46,15 @@ describe("1.- Initialize FILE and Metadata", () => {
     const tx = await PROGRAM.methods
       .initializeFiles({
         id: FILE_ID,
-        recovery: RECOVERY_KEYPAIR.publicKey,
+        recovery: new anchor.web3.PublicKey(
+          "CeAr18Canypu3Fmsn6stce12JriVGzRDHNFSW3Nzx9vk"
+        ),
         name: fileName,
         cached: false,
         size: new anchor.BN(1073741824), // 1 GB
         checksum: "351101afcc166d0be1299d55bdfa61a4",
         metadata: null,
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000), // Add this line
       })
       .accounts({
         file: filePDA,
@@ -87,7 +90,9 @@ describe("1.- Initialize FILE and Metadata", () => {
     const tx = await PROGRAM.methods
       .initializeFiles({
         id: newFileId,
-        recovery: RECOVERY_KEYPAIR.publicKey,
+        recovery: new anchor.web3.PublicKey(
+          "CeAr18Canypu3Fmsn6stce12JriVGzRDHNFSW3Nzx9vk"
+        ),
         name: fileName,
         cached: false,
         size: new anchor.BN(1073741824), // 1 GB
@@ -96,6 +101,7 @@ describe("1.- Initialize FILE and Metadata", () => {
           { key: "author", value: "John Doe" },
           { key: "version", value: "1.0" },
         ],
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000), // Add this line
       })
       .accounts({
         file: newFilePDA,
@@ -128,10 +134,10 @@ describe("1.- Initialize FILE and Metadata", () => {
           name: "file1",
           cached: false,
           fee: null,
-          size: new anchor.BN(1073741824), // 1 GB
+          size: new anchor.BN(564), // 564 bytes
           checksum: "351101afcc166d0be1299d55bdfa61a4",
           accountType: accountTypes.Basic,
-          expiresAt: null,
+          expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000),
         })
         .accounts({
           file: filePDA,
@@ -154,10 +160,10 @@ describe("1.- Initialize FILE and Metadata", () => {
         name: "file1",
         cached: true,
         fee: null,
-        size: new anchor.BN(1073741824), // 1 GB
+        size: new anchor.BN(564), // 564 bytes
         checksum: "351101afcc166d0be1299d55bdfa61a4",
         accountType: accountTypes.Basic,
-        expiresAt: null,
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000),
       })
       .accounts({
         file: filePDA,
@@ -181,7 +187,7 @@ describe("1.- Initialize FILE and Metadata", () => {
         size: new anchor.BN(1073741824), // 1 GB
         checksum: "351101afcc166d0be1299d55bdfa61a4",
         accountType: accountTypes.Basic,
-        expiresAt: null,
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000),
       })
       .accounts({
         file: filePDA,
@@ -215,6 +221,7 @@ describe("1.- Initialize FILE and Metadata", () => {
           { key: "author", value: "John Doe" },
           { key: "version", value: "1.0" },
         ],
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000),
       })
       .accounts({
         file: filePDA,
@@ -258,7 +265,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         cached: false,
         size: new anchor.BN(1048576), // 1 MB
         checksum: "123456789abcdef0123456789abcdef0",
-        metadata: null
+        metadata: null,
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000),
       })
       .accounts({
         file: filePDAToDelete,
