@@ -125,6 +125,55 @@ describe("1.- Initialize FILE and Metadata", () => {
     ]);
   });
 
+  it("Init file with different rent payer", async () => {
+    const newFileId = anchor.web3.Keypair.generate().publicKey;
+    const newFilePDA = await file_pda(newFileId);
+
+    const fileName = "file3";
+
+    let tx = await PROGRAM.methods
+      .initializeFiles({
+        id: newFileId,
+        recovery: RECOVERY_KEYPAIR.publicKey,
+        name: fileName,
+        cached: false,
+        size: new anchor.BN(1073741824), // 1 GB
+        checksum: "351101afcc166d0be1299d55bdfa61a4",
+        metadata: null,
+        expiresAt: new anchor.BN(Math.floor(Date.now() / 1000) + 31536000),
+      })
+      .accounts({
+        file: newFilePDA,
+        fileMetadata: null,
+        rentPayer: ANOTHER_WALLET.publicKey,
+      })
+      .signers([ANOTHER_WALLET])
+      .transaction();
+
+    // Implement manual fee payer and transaction processing (encapsulated by Anchor's implementation by default)
+    tx.feePayer = ANOTHER_WALLET.publicKey;
+    tx.recentBlockhash = (
+      await PROVIDER.connection.getLatestBlockhash()
+    ).blockhash;
+    tx.partialSign(ANOTHER_WALLET);
+
+    tx = await PROVIDER.wallet.signTransaction(tx);
+    const rawTx = tx.serialize();
+
+    // Send transaction and confirm
+    // TODO: Check if this is the correct way to send a raw transaction
+    const txResponse = await PROVIDER.connection.sendRawTransaction(rawTx);
+    await PROVIDER.connection.confirmTransaction(txResponse, "confirmed");
+
+    let file = await PROGRAM.account.file.fetch(newFilePDA);
+
+    expect(file.id.toBase58()).to.equal(newFileId.toBase58());
+    expect(file.authority.toBase58()).to.equal(
+      PROVIDER.wallet.publicKey.toBase58()
+    );
+    expect(file.name).to.equal(fileName);
+  });
+
   it("Update file authority", async () => {
     try {
       await PROGRAM.methods
