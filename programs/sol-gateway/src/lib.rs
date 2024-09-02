@@ -11,7 +11,7 @@ pub mod instructions;
 pub mod state;
 pub mod utils;
 
-declare_id!("6CvJLL1q7A9vD97jHGtr8EX7LoaPEP51HH2ab2JLUn9m");
+declare_id!("C8TANLzc5UKGQBzhmKjrs7nAB326zxoBFtJ9x48C5S6Z");
 
 #[program]
 pub mod sol_gateway {
