@@ -41,7 +41,7 @@ pub struct UpdateFileData {
     pub size: Option<u64>,
     pub checksum: String,
     pub account_type: u8,
-    pub expires_at: i64,
+    pub expires_at: Option<i64>,
 }
 
 #[account]

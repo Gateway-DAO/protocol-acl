@@ -8,29 +8,23 @@ use crate::Errors::InvalidRole;
 use anchor_lang::prelude::*;
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 
-// SPACE SIZE:
-// + 8 discriminator
-// + 32 file_id (Pubkey)
-// + 1 + 32 address Option<Pubkey>
-// + 4 + 16 role (string)
-// + 1 + 1 address_type
-// + 1 + 8 expires_at Option<i64>
-// + 1 bump
-// total = 8 + 32 + 1 + 32 + 4 + 16 + 1 + 1 +  1 + 8 + 1 = 105
 #[derive(Accounts)]
 #[instruction(assign_role_data:AssignRoleData)]
 pub struct AssignRole<'info> {
     #[account(mut)]
-    pub signer: Signer<'info>,
+    pub contributor: Signer<'info>,
+
     #[account(
         init,
-        payer = signer,
+        payer = rent_payer,
         space = 105,
         seeds = [assign_role_data.role.as_ref(), address_or_wildcard(&assign_role_data.address), sol_gateway_file.id.key().as_ref()],
-        constraint = valid_rule(&assign_role_data.role, true)  @ InvalidRole,
+        constraint = valid_rule(&assign_role_data.role, true) @ InvalidRole,
         bump
     )]
     pub role: Account<'info, Role>,
+
+    /** Validation accounts */
     #[account(
         seeds = [b"file".as_ref(), sol_gateway_file.id.key().as_ref()],
         bump = sol_gateway_file.bump,
@@ -56,18 +50,22 @@ pub struct AssignRole<'info> {
     pub sol_gateway_metadata: Option<Box<Account<'info, MetadataAccount>>>,
     #[account(
         init_if_needed,
-        payer = signer,
+        payer = rent_payer,
         space = 9, // Account discriminator + initialized
-        seeds = [b"seed".as_ref(), signer.key.as_ref()],
+        seeds = [b"seed".as_ref(), contributor.key.as_ref()],
         bump
     )]
     pub sol_gateway_seed: Option<Account<'info, Seed>>,
+
+    #[account(mut)]
+    pub rent_payer: Signer<'info>,
+
     pub system_program: Program<'info, System>,
 }
 
 pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
     allowed(
-        &ctx.accounts.signer,
+        &ctx.accounts.contributor,
         &ctx.accounts.sol_gateway_file,
         &ctx.accounts.sol_gateway_role,
         &ctx.accounts.sol_gateway_rule,
@@ -90,6 +88,7 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
     role.role = assign_role_data.role;
     role.address_type = assign_role_data.address_type;
     role.expires_at = assign_role_data.expires_at;
+
     emit!(RolesChanged {
         time: utc_now(),
         file_id: ctx.accounts.sol_gateway_file.id,

@@ -79,7 +79,7 @@ mod tests {
             size: 0,
             checksum: "test".to_string(),
             account_type: AccountTypes::Basic as u8,
-            expires_at: None,
+            expires_at: 0,
         };
         assert_eq!(get_fee(&file), if FEE.is_some() { FEE.unwrap() } else { 0 });
         file.fee = Some(10);
