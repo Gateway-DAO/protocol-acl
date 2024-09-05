@@ -1,12 +1,12 @@
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 use crate::state::{File, Seed};
 use crate::state::rule::Rule;
-use crate::utils::{allowed_perm, utc_now, address_or_wildcard, allowed_authority, get_fee, subtract_rent_exemption_from_fee};
+use crate::utils::{allowed_perm, utc_now, allowed_authority, get_fee, subtract_rent_exemption_from_fee};
 use crate::state::role::Role;
 use crate::metadata_program;
 use anchor_lang::prelude::*;
 use crate::Errors::{Unauthorized, InvalidFileID, MissingSeedAccount};
-
+use crate::state::role::RoleType;
 
 #[derive(Accounts)]
 pub struct Allowed<'info> {
@@ -23,7 +23,7 @@ pub struct Allowed<'info> {
     )]
     pub sol_gateway_rule: Option< Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()], 
+        seeds = [sol_gateway_role.address.as_ref(), sol_gateway_role.file_id.key().as_ref()], 
         bump = sol_gateway_role.bump
     )]
     pub sol_gateway_role: Option< Box<Account<'info, Role>>>,
@@ -51,7 +51,7 @@ pub struct AllowedRule {
     pub file_id: Pubkey,
     pub namespace: u8,
     pub resource: String,
-    pub permission: String,
+    pub roles: Vec<RoleType>,
 }
 
 
@@ -110,12 +110,12 @@ pub fn allowed<'info>(
     }
 
     // Check Resource & Permission
-    if !allowed_perm(&allowed_rule.resource, &rule.resource) || !allowed_perm(&allowed_rule.permission, &rule.permission){
+    if !allowed_perm(&allowed_rule.resource, &rule.resource) || !allowed_perm(&allowed_rule.roles, &rule.permission){
         return Err(error!(Unauthorized))
     }
 
     // Check Role
-    if role.role != rule.role {
+    if role.roles.iter().all(|r| !rule.roles.contains(r)) {
         return Err(error!(Unauthorized))
     }
 
@@ -129,7 +129,7 @@ pub fn allowed<'info>(
         return Err(error!(Unauthorized))
     }
     // Check if the wallet is authorized (Address = "None" is considered wildcard "*")
-      if role.address.is_none() || signer.key() == role.address.unwrap(){
+      if signer.key() == role.address {
             return pay_fee(system_program, signer, seed, fee);
     }
     // Check if the file or Collection Mint addresses are authorized
@@ -140,7 +140,7 @@ pub fn allowed<'info>(
             return Err(error!(Unauthorized))
         }
         // File authorized (Address = "None" is considered wildcard "*")
-        if role.address.is_none() || token.mint == role.address.unwrap(){
+        if token.mint == role.address {
             return pay_fee(system_program, signer, seed, fee);
         }
         if  metadata.is_some() {
@@ -148,7 +148,7 @@ pub fn allowed<'info>(
             if metadata.collection.is_some() && metadata.mint == token.mint {
                 let collection = metadata.collection.as_ref().unwrap();
                 // Collection authorized (Address = "None" is considered wildcard "*")
-                if collection.verified && (role.address.is_none() || collection.key == role.address.unwrap()){
+                if collection.verified && collection.key == role.address{
                     return pay_fee(system_program, signer, seed, fee);
                 }
             }

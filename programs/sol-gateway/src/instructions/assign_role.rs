@@ -77,7 +77,7 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AssignRole as u8,
             resource: assign_role_data.address_type.to_string(),
-            permission: assign_role_data.role.clone(),
+            roles: assign_role_data.roles.clone(),
         },
     )?;
 

@@ -1,6 +1,6 @@
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 use crate::instructions::allowed::{allowed, AllowedRule};
-use crate::utils::{valid_rules, utc_now, validate_ns_permission, roles::address_or_wildcard};
+use crate::utils::{valid_rules, utc_now, validate_ns_permission};
 use crate::state::role::Role;
 use anchor_lang::prelude::*;
 use crate::state::file::{File, Seed};
@@ -8,16 +8,6 @@ use crate::state::rule::*;
 use crate::Errors;
 use crate::metadata_program;
 
-// SPACE SIZE:
-// + 8 discriminator
-// + 32 file_id (Pubkey)
-// + 1 namespace (u8)
-// + 4 + 16 role (string)
-// + 4 + 16 resource (string)
-// + 4 + 16  permission (string)
-// + 1 + 8 expires_at Option<i64>
-// + 1 bump
-// total = 8 + 32 + 1 + 4 + 16 + 4 + 16 + 4 + 16  + 1 + 8 + 1 = 111
 #[derive(Accounts)]
 #[instruction(rule_data:RuleData)]
 pub struct AddRule<'info> {
@@ -27,8 +17,8 @@ pub struct AddRule<'info> {
         init,
         payer = signer,
         space = 111,
-        seeds = [rule_data.namespace.to_le_bytes().as_ref(), rule_data.role.as_ref(), rule_data.resource.as_ref(), rule_data.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
-        constraint = valid_rules(&rule_data.role, &rule_data.resource, &rule_data.permission)  @ Errors::InvalidRule,
+        seeds = [rule_data.namespace.to_le_bytes().as_ref(), rule_data.roles.as_ref(), rule_data.resource.as_ref(), rule_data.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
+        constraint = valid_rules(&rule_data.roles, &rule_data.resource, &rule_data.permission)  @ Errors::InvalidRule,
         bump
     )]
     pub rule: Account<'info, Rule>,
@@ -38,17 +28,17 @@ pub struct AddRule<'info> {
     )]
     pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
-        seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
+        seeds = [sol_gateway_role.address.as_ref(), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
     #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.role.as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.roles.as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
         bump = sol_gateway_rule2.bump,
     )]
     pub sol_gateway_rule2: Option<Box<Account<'info, Rule>>>,
@@ -89,7 +79,7 @@ pub fn add_rule(
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleNSRole as u8,
             resource: data.namespace.to_string(),
-            permission: data.role.to_string(),
+            roles: data.roles,
         },
     )?;
     // // Checks if is allowed to add a rule for this specific Resource and Permission.
@@ -106,7 +96,7 @@ pub fn add_rule(
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleResourcePerm as u8,
             resource: data.resource.to_string(),
-            permission: data.permission.to_string(),
+            roles: data.roles,
         },
     )?;
 
@@ -128,7 +118,7 @@ pub fn add_rule(
     rule.bump = ctx.bumps.rule;
     rule.file_id = ctx.accounts.sol_gateway_file.id;
     rule.namespace = data.namespace;
-    rule.role = data.role;
+    rule.roles = data.roles;
     rule.resource = data.resource;
     rule.permission = data.permission;
     rule.expires_at = data.expires_at;

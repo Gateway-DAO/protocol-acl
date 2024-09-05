@@ -70,7 +70,7 @@ pub fn delete_assigned_role(ctx: Context<DeleteAssignedRole>) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::DeleteAssignRole as u8,
             resource: ctx.accounts.role.address_type.to_string(),
-            permission: ctx.accounts.role.role.clone(),
+            roles: ctx.accounts.role.roles.clone(),
         },
     )?;
 

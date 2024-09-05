@@ -3,7 +3,7 @@ use crate::instructions::allowed::{allowed, AllowedRule};
 use crate::state::file::{File, Seed};
 use crate::state::role::Role;
 use crate::state::rule::*;
-use crate::utils::{utc_now, roles::address_or_wildcard};
+use crate::utils::utc_now;
 use anchor_lang::prelude::*;
 use crate::metadata_program;
 
@@ -78,7 +78,7 @@ pub fn delete_rule(
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::DeleteRuleNSRole as u8,
             resource: ctx.accounts.rule.namespace.to_string(),
-            permission: ctx.accounts.rule.role.to_string(),
+            roles: ctx.accounts.rule.roles.clone(),
         },
     )?;
     // // Checks if is allowed to delete a rule for this specific Resource and Permission.
@@ -95,7 +95,7 @@ pub fn delete_rule(
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::DeleteRuleResourcePerm as u8,
             resource: ctx.accounts.rule.resource.to_string(),
-            permission: ctx.accounts.rule.permission.to_string(),
+            roles: ctx.accounts.rule.roles.clone(),
         },
     )?;
 
