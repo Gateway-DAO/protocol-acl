@@ -110,7 +110,7 @@ pub fn allowed<'info>(
     }
 
     // Check Resource & Permission
-    if !allowed_perm(&allowed_rule.resource, &rule.resource) || !allowed_perm(&allowed_rule.roles, &rule.permission){
+    if !allowed_perm(&allowed_rule.resource, &rule.resource) || !rule.roles.iter().any(|r| allowed_rule.roles.contains(r)) {
         return Err(error!(Unauthorized))
     }
 

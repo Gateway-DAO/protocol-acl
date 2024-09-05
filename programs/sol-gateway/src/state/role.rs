@@ -20,7 +20,7 @@ impl AddressType {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq, Eq, Copy)]
 pub enum RoleType {
     View,
     Update,
@@ -37,6 +37,12 @@ impl RoleType {
             RoleType::Share => "S",
         }
         .to_string()
+    }
+
+    pub fn is_valid(&self) -> bool {
+        match self {
+            RoleType::View | RoleType::Update | RoleType::Delete | RoleType::Share => true,
+        }
     }
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Debug)]

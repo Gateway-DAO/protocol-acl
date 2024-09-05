@@ -19,7 +19,7 @@ pub struct AssignRole<'info> {
         payer = rent_payer,
         space = 105,
         seeds = [assign_role_data.address.as_ref(), sol_gateway_file.id.key().as_ref()],
-        constraint = valid_rule(&assign_role_data.roles, true) @ InvalidRole,
+        constraint = valid_rule(&assign_role_data.roles) @ InvalidRole,
         bump
     )]
     pub role: Account<'info, Role>,

@@ -76,7 +76,7 @@ pub fn add_rule(ctx: Context<AddRule>, data: RuleData) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleNSRole as u8,
             resource: data.namespace.to_string(),
-            roles: data.roles,
+            roles: data.roles.clone(),
         },
     )?;
     // // Checks if is allowed to add a rule for this specific Resource and Permission.
@@ -93,7 +93,7 @@ pub fn add_rule(ctx: Context<AddRule>, data: RuleData) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleResourcePerm as u8,
             resource: data.resource.to_string(),
-            roles: data.roles,
+            roles: data.roles.clone(),
         },
     )?;
 
