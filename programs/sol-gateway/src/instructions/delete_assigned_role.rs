@@ -30,7 +30,7 @@ pub struct DeleteAssignedRole<'info> {
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
     #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,

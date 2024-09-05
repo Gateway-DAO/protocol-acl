@@ -1,12 +1,11 @@
-use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 use crate::instructions::allowed::{allowed, AllowedRule};
+use crate::metadata_program;
 use crate::state::file::{File, Seed};
 use crate::state::role::Role;
 use crate::state::rule::*;
 use crate::utils::utc_now;
 use anchor_lang::prelude::*;
-use crate::metadata_program;
-
+use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 
 #[derive(Accounts)]
 pub struct DeleteRule<'info> {
@@ -15,7 +14,7 @@ pub struct DeleteRule<'info> {
     #[account(
         mut,
         close = collector,
-        seeds = [rule.namespace.to_le_bytes().as_ref(), rule.role.as_ref(), rule.resource.as_ref(), rule.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
+        seeds = [rule.namespace.to_le_bytes().as_ref(), rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), rule.resource.as_ref(), rule.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
         bump = rule.bump,
     )]
     pub rule: Account<'info, Rule>,
@@ -30,12 +29,12 @@ pub struct DeleteRule<'info> {
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
     #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.role.as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.role.as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
         bump = sol_gateway_rule2.bump,
     )]
     pub sol_gateway_rule2: Option<Box<Account<'info, Rule>>>,
@@ -61,11 +60,9 @@ pub struct DeleteRule<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn delete_rule(
-    ctx: Context<DeleteRule>
-) -> Result<()> {
-      // Checks if is allowed to delete a rule for this specific Namespace and Role.
-      allowed(
+pub fn delete_rule(ctx: Context<DeleteRule>) -> Result<()> {
+    // Checks if is allowed to delete a rule for this specific Namespace and Role.
+    allowed(
         &ctx.accounts.signer,
         &ctx.accounts.sol_gateway_file,
         &ctx.accounts.sol_gateway_role,
