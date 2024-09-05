@@ -13,7 +13,7 @@ pub struct UpdateFile<'info> {
         mut,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
-        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || allowed_roles(&role.unwrap().roles, &vec![RoleType::Update]) @ Errors::UnauthorizedAuthorityUpdate,
+        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Update]) @ Errors::UnauthorizedAuthorityUpdate,
     )]
     pub file: Box<Account<'info, File>>,
 

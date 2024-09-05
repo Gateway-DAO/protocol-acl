@@ -14,7 +14,7 @@ pub struct DeleteFile<'info> {
     #[account(
         mut,
         close = collector,
-        constraint = allowed_authority(&authority.key(), &file.authority) || allowed_roles(&role.unwrap().roles, &vec![RoleType::Delete]) @ Errors::Unauthorized,
+        constraint = allowed_authority(&authority.key(), &file.authority) || allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Delete]) @ Errors::Unauthorized,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
     )]
@@ -27,6 +27,7 @@ pub struct DeleteFile<'info> {
     pub role: Option<Account<'info, Role>>,
 
     #[account(mut)]
+    /// CHECK: collector is an account that doesn't need to sign/be checked
     collector: AccountInfo<'info>,
 }
 
