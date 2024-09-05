@@ -3,7 +3,7 @@ use crate::metadata_program;
 use crate::state::file::{File, Seed};
 use crate::state::role::*;
 use crate::state::rule::{Namespaces, Rule};
-use crate::utils::{roles::address_or_wildcard, rules::*, utc_now};
+use crate::utils::{rules::*, utc_now};
 use crate::Errors::InvalidRole;
 use anchor_lang::prelude::*;
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
@@ -18,8 +18,8 @@ pub struct AssignRole<'info> {
         init,
         payer = rent_payer,
         space = 105,
-        seeds = [assign_role_data.role.as_ref(), address_or_wildcard(&assign_role_data.address), sol_gateway_file.id.key().as_ref()],
-        constraint = valid_rule(&assign_role_data.role, true) @ InvalidRole,
+        seeds = [assign_role_data.address.as_ref(), sol_gateway_file.id.key().as_ref()],
+        constraint = valid_rule(&assign_role_data.roles, true) @ InvalidRole,
         bump
     )]
     pub role: Account<'info, Role>,
@@ -31,7 +31,7 @@ pub struct AssignRole<'info> {
     )]
     pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
-        seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
+        seeds = [sol_gateway_role.address.as_ref(), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
@@ -85,7 +85,7 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
     role.bump = ctx.bumps.role;
     role.file_id = ctx.accounts.sol_gateway_file.id;
     role.address = assign_role_data.address;
-    role.role = assign_role_data.role;
+    role.roles = assign_role_data.roles;
     role.address_type = assign_role_data.address_type;
     role.expires_at = assign_role_data.expires_at;
 

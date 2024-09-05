@@ -39,7 +39,7 @@ impl RoleType {
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct AssignRoleData {
-    pub address: Option<Pubkey>,
+    pub address: Pubkey,
     pub roles: Vec<RoleType>,
     pub address_type: AddressType,
     pub expires_at: Option<i64>,
@@ -48,7 +48,7 @@ pub struct AssignRoleData {
 #[account]
 pub struct Role {
     pub file_id: Pubkey,
-    pub address: Option<Pubkey>,
+    pub address: Pubkey,
     pub roles: Vec<RoleType>,
     pub address_type: AddressType,
     pub expires_at: Option<i64>,

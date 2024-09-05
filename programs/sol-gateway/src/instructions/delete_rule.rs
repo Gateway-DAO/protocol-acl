@@ -25,7 +25,7 @@ pub struct DeleteRule<'info> {
     )]
     pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
-        seeds = [sol_gateway_role.role.as_ref(), address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
+        seeds = [sol_gateway_role.address.as_ref(), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,

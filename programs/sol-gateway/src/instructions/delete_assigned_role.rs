@@ -4,7 +4,7 @@ use crate::state::file::{File, Seed};
 use crate::state::role::{Role, RolesChanged};
 use crate::state::rule::Namespaces;
 use crate::state::rule::Rule;
-use crate::utils::{roles::address_or_wildcard, utc_now};
+use crate::utils::utc_now;
 use anchor_lang::prelude::*;
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 
@@ -15,7 +15,7 @@ pub struct DeleteAssignedRole<'info> {
     #[account(
         mut,
         close = collector,
-        seeds = [role.role.as_ref(), address_or_wildcard(&role.address), sol_gateway_file.id.key().as_ref()],
+        seeds = [role.address.as_ref(), sol_gateway_file.id.key().as_ref()],
         bump = role.bump,
     )]
     pub role: Account<'info, Role>,
@@ -25,7 +25,7 @@ pub struct DeleteAssignedRole<'info> {
     )]
     pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
-        seeds = [sol_gateway_role.role.as_ref(),  address_or_wildcard(&sol_gateway_role.address), sol_gateway_role.file_id.key().as_ref()],
+        seeds = [sol_gateway_role.address.as_ref(), sol_gateway_role.file_id.key().as_ref()],
         bump = sol_gateway_role.bump
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
