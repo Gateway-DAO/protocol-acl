@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 
+use super::RoleType;
+
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Debug)]
 pub struct RuleData {
     pub namespace: u8,
@@ -32,7 +34,7 @@ pub enum Namespaces {
 pub struct Rule {
     pub file_id: Pubkey,
     pub namespace: u8,
-    pub role: String,
+    pub roles: Vec<RoleType>,
     pub resource: String,
     pub permission: String,
     pub expires_at: Option<i64>,
