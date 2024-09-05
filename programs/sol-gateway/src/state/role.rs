@@ -5,6 +5,7 @@ pub enum AddressType {
     Wallet,
     // Nft,
     Collection,
+    DID,
 }
 
 impl AddressType {
@@ -13,6 +14,7 @@ impl AddressType {
             AddressType::Wallet => "Wallet",
             // AddressType::Nft => "Nft",
             AddressType::Collection => "Collection",
+            AddressType::DID => "DID",
         }
         .to_string()
     }
