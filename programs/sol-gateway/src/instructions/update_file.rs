@@ -1,19 +1,27 @@
 use crate::state::file::*;
+use crate::state::role::Role;
+use crate::state::role::RoleType;
+use crate::utils::roles::allowed_roles;
 use crate::utils::{program_authority_field, utc_now, validate_string_len};
 use crate::Errors;
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct UpdateFile<'info> {
-    pub signer: Signer<'info>, // Only current Authority or Recovery key can update the Authority
+    pub authority: Signer<'info>,
     #[account(
         mut,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
-        constraint = file.authority == signer.key() || (file.recovery.is_some() && file.recovery.unwrap() == signer.key())   @ Errors::UnauthorizedAuthorityUpdate,
+        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || allowed_roles(&role.unwrap().roles, &vec![RoleType::Update]) @ Errors::UnauthorizedAuthorityUpdate,
     )]
     pub file: Box<Account<'info, File>>,
-    pub system_program: Program<'info, System>,
+
+    #[account(
+        seeds = [authority.key().as_ref(), file.id.key().as_ref()],
+        bump = role.bump,
+    )]
+    pub role: Option<Account<'info, Role>>,
 }
 
 pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Result<()> {
