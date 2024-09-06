@@ -1,23 +1,36 @@
 use crate::{
-    state::file::*, utils::allowed_authority, Errors, FileMetadata, MetadataData, MetadataUpdated,
+    role::{Role, RoleType},
+    state::file::*,
+    utils::allowed_authority,
+    utils::roles::allowed_roles,
+    Errors, FileMetadata, MetadataData, MetadataUpdated,
 };
 use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct UpdateFileMetadata<'info> {
-    pub signer: Signer<'info>,
+    pub authority: Signer<'info>,
     #[account(
-        seeds = [b"file".as_ref(), file.id.key().as_ref()],
+        mut,
+        seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
-        constraint = file.authority == signer.key() || (file.recovery.is_some() && file.recovery.unwrap() == signer.key()) @ Errors::UnauthorizedMetadataUpdate,
+        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || (role.is_some() && allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Update])) @ Errors::UnauthorizedAuthorityUpdate,
     )]
     pub file: Box<Account<'info, File>>,
+
     #[account(
         mut,
         seeds = [b"metadata".as_ref(), file.id.key().as_ref()],
         bump = file_metadata.bump,
     )]
     pub file_metadata: Account<'info, FileMetadata>,
+
+    #[account(
+        seeds = [authority.key().as_ref(), file.id.key().as_ref()],
+        bump = role.bump,
+    )]
+    pub role: Option<Box<Account<'info, Role>>>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -29,7 +42,7 @@ pub fn update_file_metadata(
     let file_metadata = &mut ctx.accounts.file_metadata;
 
     require!(
-        allowed_authority(&ctx.accounts.signer.key(), &file.authority),
+        allowed_authority(&ctx.accounts.authority.key(), &file.authority),
         Errors::UnauthorizedMetadataUpdate
     );
 
