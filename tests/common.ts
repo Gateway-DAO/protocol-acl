@@ -52,14 +52,13 @@ export async function seed_pda(signer: PublicKey) {
 /**
  *  Empty Addresses are considered wildcards "*" (role will be applied to all users)
  */
-export async function role_pda(role, address: PublicKey | null) {
+export async function role_pda(
+  address: PublicKey,
+  fileId: PublicKey = FILE_ID
+) {
   return (
     await PublicKey.findProgramAddressSync(
-      [
-        anchor.utils.bytes.utf8.encode(role),
-        address ? address.toBuffer() : anchor.utils.bytes.utf8.encode("*"),
-        FILE_ID.toBuffer(),
-      ],
+      [address.toBuffer(), FILE_ID.toBuffer()],
       PROGRAM.programId
     )
   )[0];

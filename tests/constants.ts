@@ -43,6 +43,13 @@ export enum accountTypes {
   Free = 1,
 }
 
+export const RoleType = {
+  View: { view: {} },
+  Update: { update: {} },
+  Delete: { delete: {} },
+  Share: { share: {} },
+};
+
 // @TODO Improve this hack:
 // NFTs are created on Step 0 populating the following object, so they can be reused on all other tests.
 export const NFTS: {

@@ -190,7 +190,8 @@ describe("1.- Initialize FILE and Metadata", () => {
         })
         .accounts({
           file: filePDA,
-          signer: unauthorized_keypair.publicKey,
+          authority: unauthorized_keypair.publicKey,
+          role: null,
         })
         .signers([unauthorized_keypair])
         .rpc();
@@ -216,6 +217,7 @@ describe("1.- Initialize FILE and Metadata", () => {
       })
       .accounts({
         file: filePDA,
+        role: null,
       })
       .rpc();
     let file = await PROGRAM.account.file.fetch(filePDA);
@@ -240,7 +242,8 @@ describe("1.- Initialize FILE and Metadata", () => {
       })
       .accounts({
         file: filePDA,
-        signer: RECOVERY_KEYPAIR.publicKey,
+        authority: RECOVERY_KEYPAIR.publicKey,
+        role: null,
       })
       .signers([RECOVERY_KEYPAIR])
       .rpc();
@@ -290,7 +293,8 @@ describe("1.- Initialize FILE and Metadata", () => {
       .accounts({
         file: filePDA,
         fileMetadata: metadataPDA,
-        signer: PROVIDER.wallet.publicKey,
+        authority: PROVIDER.wallet.publicKey,
+        role: null,
       })
       .rpc();
 
@@ -330,6 +334,7 @@ describe("1.- Initialize FILE and Metadata", () => {
       .deleteFile()
       .accounts({
         file: filePDAToDelete,
+        role: null,
         authority: PROVIDER.wallet.publicKey,
         collector: PROVIDER.wallet.publicKey,
       })
