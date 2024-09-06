@@ -9,11 +9,12 @@ use anchor_lang::prelude::*;
 #[derive(Accounts)]
 pub struct UpdateFile<'info> {
     pub authority: Signer<'info>,
+
     #[account(
         mut,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
-        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Update]) @ Errors::UnauthorizedAuthorityUpdate,
+        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || (role.is_some() && allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Update])) @ Errors::UnauthorizedAuthorityUpdate,
     )]
     pub file: Box<Account<'info, File>>,
 
@@ -21,7 +22,7 @@ pub struct UpdateFile<'info> {
         seeds = [authority.key().as_ref(), file.id.key().as_ref()],
         bump = role.bump,
     )]
-    pub role: Option<Account<'info, Role>>,
+    pub role: Option<Box<Account<'info, Role>>>,
 }
 
 pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Result<()> {
