@@ -37,14 +37,6 @@ pub mod sol_gateway {
         instructions::update_metadata::update_file_metadata(ctx, metadata_data)
     }
 
-    pub fn add_rule(ctx: Context<AddRule>, rule_data: RuleData) -> Result<()> {
-        instructions::add_rule::add_rule(ctx, rule_data)
-    }
-
-    pub fn delete_rule(ctx: Context<DeleteRule>) -> Result<()> {
-        instructions::delete_rule::delete_rule(ctx)
-    }
-
     pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
         instructions::assign_role::assign_role(ctx, assign_role_data)
     }
