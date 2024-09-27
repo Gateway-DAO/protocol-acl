@@ -46,14 +46,6 @@ pub mod sol_gateway {
     }
 
     /**
-     * Updates either file.roles_updated_at or file.rules_updated_at fields, so clients
-     * can keep track and cache roles & rules accordingly.
-     */
-    pub fn update_cache(ctx: Context<UpdateCache>, cache_updated: u8) -> Result<()> {
-        instructions::update_cache::update_cache(ctx, cache_updated)
-    }
-
-    /**
      * Checks if the current user is authorized to run the instruction,
      * throwing "Unauthorized" error otherwise.
      */
