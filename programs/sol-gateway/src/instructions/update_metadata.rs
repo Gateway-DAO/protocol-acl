@@ -1,8 +1,7 @@
 use crate::{
-    role::{Role, RoleType},
+    role::Role,
     state::file::*,
-    utils::allowed_authority,
-    utils::roles::allowed_roles,
+    utils::{allowed_authority, perform_action},
     Errors, FileMetadata, MetadataData, MetadataUpdated,
 };
 use anchor_lang::prelude::*;
@@ -14,7 +13,7 @@ pub struct UpdateFileMetadata<'info> {
         mut,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
-        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || (role.is_some() && allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Update])) @ Errors::UnauthorizedAuthorityUpdate,
+        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || (role.is_some() && perform_action(&role.as_ref().unwrap().permission_level, crate::ActionType::Update)) @ Errors::InsufficientPermission,
     )]
     pub file: Box<Account<'info, File>>,
 

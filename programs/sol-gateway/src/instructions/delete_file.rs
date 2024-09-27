@@ -1,8 +1,7 @@
 use crate::state::file::{File, FileChanged};
-use crate::state::role::{Role, RoleType};
+use crate::state::role::Role;
 use crate::utils::file::allowed_authority;
-use crate::utils::roles::allowed_roles;
-use crate::utils::utc_now;
+use crate::utils::{perform_action, utc_now};
 use crate::Errors;
 use anchor_lang::prelude::*;
 
@@ -14,7 +13,7 @@ pub struct DeleteFile<'info> {
     #[account(
         mut,
         close = collector,
-        constraint = allowed_authority(&authority.key(), &file.authority) || allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Delete]) @ Errors::Unauthorized,
+        constraint = allowed_authority(&authority.key(), &file.authority) || (role.is_some() && perform_action(&role.as_ref().unwrap().permission_level, crate::ActionType::Delete)) @ Errors::Unauthorized,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
     )]

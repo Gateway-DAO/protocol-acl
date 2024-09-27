@@ -1,7 +1,6 @@
 use crate::state::file::*;
 use crate::state::role::Role;
-use crate::state::role::RoleType;
-use crate::utils::roles::allowed_roles;
+use crate::utils::perform_action;
 use crate::utils::{program_authority_field, utc_now, validate_string_len};
 use crate::Errors;
 use anchor_lang::prelude::*;
@@ -14,7 +13,7 @@ pub struct UpdateFile<'info> {
         mut,
         seeds = [b"file".as_ref(), file.id.key().as_ref()], 
         bump = file.bump,
-        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || (role.is_some() && allowed_roles(&role.as_ref().unwrap().roles, &vec![RoleType::Update])) @ Errors::UnauthorizedAuthorityUpdate,
+        constraint = file.authority == authority.key() || (file.recovery.is_some() && file.recovery.unwrap() == authority.key()) || (role.is_some() && perform_action(&role.as_ref().unwrap().permission_level, crate::ActionType::Update)) @ Errors::InsufficientPermission,
     )]
     pub file: Box<Account<'info, File>>,
 
