@@ -36,14 +36,12 @@ pub struct InitializeFiles<'info> {
 pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> Result<()> {
     let file = &mut ctx.accounts.file;
     file.id = file_data.id;
-    file.account_type = AccountTypes::Basic as u8;
     file.authority = ctx.accounts.contributor.key();
     file.recovery = file_data.recovery;
-    file.name = validate_string_len(&file_data.name, 0, 16)?;
+    file.fid = validate_string_len(&file_data.fid, 0, 16)?; //
     file.fee = None;
     file.size = file_data.size;
     file.checksum = validate_string_len(&file_data.checksum, 0, 32)?;
-    file.cached = file_data.cached;
     file.rules_updated_at = utc_now();
     file.roles_updated_at = file.rules_updated_at;
     file.expires_at = file_data.expires_at;

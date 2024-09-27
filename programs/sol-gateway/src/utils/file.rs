@@ -51,7 +51,6 @@ pub fn program_authority_field<T: PartialEq>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::state::AccountTypes;
     use solana_program::pubkey;
 
     #[test]
@@ -71,14 +70,12 @@ mod tests {
             authority: pubkey!("6kJuLfs8BrKwxy28FCmcPfp4d5stv4Sr6YgV15A6s7FK"),
             recovery: None, // Only recovery or authority accounts can update the File Authority.
             bump: 0,
-            name: "test".to_string(),
+            fid: "test".to_string(),
             roles_updated_at: 0,
             rules_updated_at: 0,
-            cached: false,
             fee: None,
             size: 0,
             checksum: "test".to_string(),
-            account_type: AccountTypes::Basic as u8,
             expires_at: 0,
         };
         assert_eq!(get_fee(&file), if FEE.is_some() { FEE.unwrap() } else { 0 });

@@ -28,14 +28,8 @@ pub fn update_file(ctx: Context<UpdateFile>, file_data: UpdateFileData) -> Resul
     let file = &mut ctx.accounts.file;
     file.authority = file_data.authority;
     file.recovery = file_data.recovery;
-    file.name = validate_string_len(&file_data.name, 0, 16)?;
-    file.account_type = program_authority_field(
-        &file_data.authority,
-        file.account_type,
-        file_data.account_type,
-    )?;
+    file.fid = validate_string_len(&file_data.fid, 0, 16)?;
     file.fee = program_authority_field(&file_data.authority, file.fee, file_data.fee)?;
-    file.cached = file_data.cached;
     file.size = file_data.size.unwrap_or(file.size);
     file.checksum = validate_string_len(&file_data.checksum, 0, 32)?;
     file.expires_at = file_data.expires_at.unwrap_or(file.expires_at);
