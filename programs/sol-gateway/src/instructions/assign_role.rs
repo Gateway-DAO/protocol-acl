@@ -1,61 +1,36 @@
-use crate::instructions::allowed::{allowed, AllowedRule};
-use crate::metadata_program;
-use crate::state::file::{File, Seed};
+use crate::state::file::File;
 use crate::state::role::*;
-use crate::state::rule::{Namespaces, Rule};
-use crate::utils::{rules::*, utc_now};
-use crate::Errors::InvalidRole;
+use crate::utils::utc_now;
+use crate::Errors;
 use anchor_lang::prelude::*;
-use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
 
 #[derive(Accounts)]
-#[instruction(assign_role_data:AssignRoleData)]
+#[instruction(assign_role_data: AssignRoleData)]
 pub struct AssignRole<'info> {
     #[account(mut)]
     pub contributor: Signer<'info>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = rent_payer,
         space = 105,
-        seeds = [assign_role_data.address.as_ref(), sol_gateway_file.id.key().as_ref()],
-        constraint = valid_rule(&assign_role_data.roles) @ InvalidRole,
-        bump
+        seeds = [assign_role_data.address.as_ref(), file.id.key().as_ref()],
+        bump,
     )]
     pub role: Account<'info, Role>,
 
-    /** Validation accounts */
     #[account(
-        seeds = [b"file".as_ref(), sol_gateway_file.id.key().as_ref()],
-        bump = sol_gateway_file.bump,
+        seeds = [b"file".as_ref(), file.id.key().as_ref()],
+        bump = file.bump,
     )]
-    pub sol_gateway_file: Box<Account<'info, File>>,
+    pub file: Box<Account<'info, File>>,
+
     #[account(
-        seeds = [sol_gateway_role.address.as_ref(), sol_gateway_role.file_id.key().as_ref()],
-        bump = sol_gateway_role.bump
+        seeds = [contributor.key().as_ref(), file.id.key().as_ref()],
+        bump = user_role.bump,
+        constraint = user_role.address == contributor.key(),
     )]
-    pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
-    #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
-        bump = sol_gateway_rule.bump,
-    )]
-    pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
-    #[account()]
-    pub sol_gateway_token: Option<Box<Account<'info, TokenAccount>>>,
-    #[account(
-        seeds = [b"metadata", metadata_program::ID.as_ref(), sol_gateway_metadata.mint.key().as_ref()],
-        seeds::program = metadata_program::ID,
-        bump,
-    )]
-    pub sol_gateway_metadata: Option<Box<Account<'info, MetadataAccount>>>,
-    #[account(
-        init_if_needed,
-        payer = rent_payer,
-        space = 9, // Account discriminator + initialized
-        seeds = [b"seed".as_ref(), contributor.key.as_ref()],
-        bump
-    )]
-    pub sol_gateway_seed: Option<Account<'info, Seed>>,
+    pub user_role: Box<Account<'info, Role>>,
 
     #[account(mut)]
     pub rent_payer: Signer<'info>,
@@ -64,34 +39,36 @@ pub struct AssignRole<'info> {
 }
 
 pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
-    allowed(
-        &ctx.accounts.contributor,
-        &ctx.accounts.sol_gateway_file,
-        &ctx.accounts.sol_gateway_role,
-        &ctx.accounts.sol_gateway_rule,
-        &ctx.accounts.sol_gateway_token,
-        &ctx.accounts.sol_gateway_metadata,
-        &mut ctx.accounts.sol_gateway_seed,
-        &ctx.accounts.system_program,
-        AllowedRule {
-            file_id: ctx.accounts.sol_gateway_file.id.key(),
-            namespace: Namespaces::AssignRole as u8,
-            resource: assign_role_data.address_type.to_string(),
-            roles: assign_role_data.roles.clone(),
-        },
-    )?;
+    let user_role = &ctx.accounts.user_role;
 
+    // Validate that the assigning user has the Share permission
+    if !user_role.can_share {
+        return Err(Errors::InsufficientSharePermission.into());
+    }
+
+    // Validate that the permission level being assigned is less than or equal to the assigning user's level
+    if assign_role_data.permission_level > user_role.permission_level {
+        return Err(Errors::CannotGrantHigherPermissionLevel.into());
+    }
+
+    // Validate that the can_share flag is only true if the assigning user has can_share
+    if assign_role_data.can_share && !user_role.can_share {
+        return Err(Errors::CannotGrantSharePermission.into());
+    }
+
+    // Initialize or update the Role account
     let role = &mut ctx.accounts.role;
     role.bump = ctx.bumps.role;
-    role.file_id = ctx.accounts.sol_gateway_file.id;
+    role.file_id = ctx.accounts.file.id;
     role.address = assign_role_data.address;
-    role.roles = assign_role_data.roles;
+    role.permission_level = assign_role_data.permission_level;
+    role.can_share = assign_role_data.can_share;
     role.address_type = assign_role_data.address_type;
     role.expires_at = assign_role_data.expires_at;
 
     emit!(RolesChanged {
         time: utc_now(),
-        file_id: ctx.accounts.sol_gateway_file.id,
+        file_id: ctx.accounts.file.id,
     });
     Ok(())
 }

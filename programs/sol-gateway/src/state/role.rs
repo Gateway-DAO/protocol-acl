@@ -20,35 +20,18 @@ impl AddressType {
     }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug, PartialEq, Eq, Copy)]
-pub enum RoleType {
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
+pub enum ActionType {
     View,
     Update,
     Delete,
-    Share,
 }
 
-impl RoleType {
-    pub fn to_string(&self) -> String {
-        match self {
-            RoleType::View => "V",
-            RoleType::Update => "U",
-            RoleType::Delete => "D",
-            RoleType::Share => "S",
-        }
-        .to_string()
-    }
-
-    pub fn is_valid(&self) -> bool {
-        match self {
-            RoleType::View | RoleType::Update | RoleType::Delete | RoleType::Share => true,
-        }
-    }
-}
 #[derive(AnchorSerialize, AnchorDeserialize, Debug)]
 pub struct AssignRoleData {
     pub address: Pubkey,
-    pub roles: Vec<RoleType>,
+    pub permission_level: u8, // 1 (View), 2 (Update), 3 (Delete)
+    pub can_share: bool,
     pub address_type: AddressType,
     pub expires_at: Option<i64>,
 }
@@ -57,7 +40,8 @@ pub struct AssignRoleData {
 pub struct Role {
     pub file_id: Pubkey,
     pub address: Pubkey,
-    pub roles: Vec<RoleType>,
+    pub permission_level: u8, // 1 for View, 2 for Update, 3 for Delete
+    pub can_share: bool,
     pub address_type: AddressType,
     pub expires_at: Option<i64>,
     pub bump: u8,

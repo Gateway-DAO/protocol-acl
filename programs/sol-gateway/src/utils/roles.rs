@@ -1,4 +1,4 @@
-use crate::state::role::RoleType;
+use crate::{ActionType, Errors, Role};
 use anchor_lang::prelude::*;
 
 pub fn address_or_wildcard(address: &Option<Pubkey>) -> &[u8] {
@@ -8,11 +8,29 @@ pub fn address_or_wildcard(address: &Option<Pubkey>) -> &[u8] {
     address.as_ref().unwrap().as_ref()
 }
 
-pub fn allowed_roles(roles: &Vec<RoleType>, allowed_roles: &Vec<RoleType>) -> bool {
-    for role in roles {
-        if allowed_roles.contains(role) {
-            return true;
+pub fn perform_action(user_role: &Role, action: ActionType) -> Result<()> {
+    match action {
+        ActionType::View => {
+            if user_role.permission_level >= 1 {
+                // Allow viewing
+            } else {
+                return Err(Errors::InsufficientPermission.into());
+            }
+        }
+        ActionType::Update => {
+            if user_role.permission_level >= 2 {
+                // Allow updating
+            } else {
+                return Err(Errors::InsufficientPermission.into());
+            }
+        }
+        ActionType::Delete => {
+            if user_role.permission_level >= 3 {
+                // Allow deleting
+            } else {
+                return Err(Errors::InsufficientPermission.into());
+            }
         }
     }
-    false
+    Ok(())
 }

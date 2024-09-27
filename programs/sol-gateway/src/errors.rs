@@ -6,8 +6,6 @@ pub enum Errors {
     UnauthorizedAuthorityUpdate,
     #[msg("Role, Resource or Permission must be betwen 1 and 16 alphanumeric characters long")]
     InvalidRule,
-    #[msg("Role must be between 1 and 16 alphanumeric characters long")]
-    InvalidRole,
     #[msg("The provided string is too short")]
     StringTooShort,
     #[msg("The provided string is too long")]
@@ -36,4 +34,16 @@ pub enum Errors {
     FileMetadataAccountNotFound,
     #[msg("Metadata account provided when no metadata was expected")]
     UnexpectedMetadataAccount,
+
+    // For the roles/permissions
+    #[msg("Insufficient permission level")]
+    InsufficientPermission,
+    #[msg("User lacks Share permission")]
+    InsufficientSharePermission,
+    #[msg("Cannot grant higher permission level than own")]
+    CannotGrantHigherPermissionLevel,
+    #[msg("Cannot grant Share permission if you don't have it")]
+    CannotGrantSharePermission,
+    #[msg("Cannot delete a role with a higher permission level than your own")]
+    CannotDeleteHigherPermissionLevel,
 }
