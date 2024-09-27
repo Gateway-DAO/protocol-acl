@@ -3,7 +3,7 @@ use crate::metadata_program;
 use crate::state::file::{File, Seed};
 use crate::state::role::Role;
 use crate::state::rule::*;
-use crate::utils::{utc_now, valid_rules, validate_ns_permission};
+use crate::utils::{utc_now, validate_ns_permission};
 use crate::Errors;
 use anchor_lang::prelude::*;
 use anchor_spl::{metadata::MetadataAccount, token::TokenAccount};
@@ -17,8 +17,7 @@ pub struct AddRule<'info> {
         init,
         payer = signer,
         space = 111,
-        seeds = [rule_data.namespace.to_le_bytes().as_ref(), rule_data.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), rule_data.resource.as_ref(), rule_data.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
-        constraint = valid_rules(&rule_data.roles, &rule_data.resource, &rule_data.permission)  @ Errors::InvalidRule,
+        seeds = [rule_data.namespace.to_le_bytes().as_ref(), rule_data.permission_level.to_le_bytes().as_ref(), rule_data.resource.as_ref(), rule_data.permission.as_ref(), sol_gateway_file.id.key().as_ref()],
         bump
     )]
     pub rule: Account<'info, Rule>,
@@ -33,12 +32,12 @@ pub struct AddRule<'info> {
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
     #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.permission_level.to_le_bytes().as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.permission_level.to_le_bytes().as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
         bump = sol_gateway_rule2.bump,
     )]
     pub sol_gateway_rule2: Option<Box<Account<'info, Rule>>>,
@@ -76,7 +75,7 @@ pub fn add_rule(ctx: Context<AddRule>, data: RuleData) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleNSRole as u8,
             resource: data.namespace.to_string(),
-            roles: data.roles.clone(),
+            permission_level: data.permission_level.clone(),
         },
     )?;
     // // Checks if is allowed to add a rule for this specific Resource and Permission.
@@ -93,7 +92,7 @@ pub fn add_rule(ctx: Context<AddRule>, data: RuleData) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::AddRuleResourcePerm as u8,
             resource: data.resource.to_string(),
-            roles: data.roles.clone(),
+            permission_level: data.permission_level.clone(),
         },
     )?;
 
@@ -122,7 +121,7 @@ pub fn add_rule(ctx: Context<AddRule>, data: RuleData) -> Result<()> {
     rule.bump = ctx.bumps.rule;
     rule.file_id = ctx.accounts.sol_gateway_file.id;
     rule.namespace = data.namespace;
-    rule.roles = data.roles;
+    rule.permission_level = data.permission_level;
     rule.resource = data.resource;
     rule.permission = data.permission;
     rule.expires_at = data.expires_at;

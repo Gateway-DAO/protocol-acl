@@ -6,7 +6,6 @@ use crate::state::role::Role;
 use crate::metadata_program;
 use anchor_lang::prelude::*;
 use crate::Errors::{Unauthorized, InvalidFileID, MissingSeedAccount};
-use crate::state::role::RoleType;
 
 #[derive(Accounts)]
 pub struct Allowed<'info> {
@@ -18,7 +17,7 @@ pub struct Allowed<'info> {
     )]
     pub sol_gateway_file: Box<Account<'info, File>>,
     #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()], 
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.permission_level.to_le_bytes().as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()], 
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option< Box<Account<'info, Rule>>>,
@@ -51,7 +50,7 @@ pub struct AllowedRule {
     pub file_id: Pubkey,
     pub namespace: u8,
     pub resource: String,
-    pub roles: Vec<RoleType>,
+    pub permission_level: u8
 }
 
 
@@ -110,12 +109,7 @@ pub fn allowed<'info>(
     }
 
     // Check Resource & Permission
-    if !allowed_perm(&allowed_rule.resource, &rule.resource) || !rule.roles.iter().any(|r| allowed_rule.roles.contains(r)) {
-        return Err(error!(Unauthorized))
-    }
-
-    // Check Role
-    if role.roles.iter().all(|r| !rule.roles.contains(r)) {
+    if !allowed_perm(&allowed_rule.resource, &rule.resource) || rule.permission_level < allowed_rule.permission_level {
         return Err(error!(Unauthorized))
     }
 

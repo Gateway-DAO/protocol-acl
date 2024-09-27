@@ -14,7 +14,7 @@ pub struct DeleteRule<'info> {
     #[account(
         mut,
         close = collector,
-        seeds = [rule.namespace.to_le_bytes().as_ref(), rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), rule.resource.as_ref(), rule.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
+        seeds = [rule.namespace.to_le_bytes().as_ref(), rule.permission_level.to_le_bytes().as_ref(), rule.resource.as_ref(), rule.permission.as_ref(), sol_gateway_file.id.key().as_ref()], 
         bump = rule.bump,
     )]
     pub rule: Account<'info, Rule>,
@@ -29,12 +29,12 @@ pub struct DeleteRule<'info> {
     )]
     pub sol_gateway_role: Option<Box<Account<'info, Role>>>,
     #[account(
-        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule.namespace.to_le_bytes().as_ref(), sol_gateway_rule.permission_level.to_le_bytes().as_ref(), sol_gateway_rule.resource.as_ref(), sol_gateway_rule.permission.as_ref(), sol_gateway_rule.file_id.key().as_ref()],
         bump = sol_gateway_rule.bump,
     )]
     pub sol_gateway_rule: Option<Box<Account<'info, Rule>>>,
     #[account(
-        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.roles.iter().map(|r| r.to_string()).collect::<Vec<String>>().join("").as_bytes(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
+        seeds = [sol_gateway_rule2.namespace.to_le_bytes().as_ref(), sol_gateway_rule2.permission_level.to_le_bytes().as_ref(), sol_gateway_rule2.resource.as_ref(), sol_gateway_rule2.permission.as_ref(), sol_gateway_rule2.file_id.key().as_ref()],
         bump = sol_gateway_rule2.bump,
     )]
     pub sol_gateway_rule2: Option<Box<Account<'info, Rule>>>,
@@ -75,7 +75,7 @@ pub fn delete_rule(ctx: Context<DeleteRule>) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::DeleteRuleNSRole as u8,
             resource: ctx.accounts.rule.namespace.to_string(),
-            roles: ctx.accounts.rule.roles.clone(),
+            permission_level: ctx.accounts.rule.permission_level.clone(),
         },
     )?;
     // // Checks if is allowed to delete a rule for this specific Resource and Permission.
@@ -92,7 +92,7 @@ pub fn delete_rule(ctx: Context<DeleteRule>) -> Result<()> {
             file_id: ctx.accounts.sol_gateway_file.id.key(),
             namespace: Namespaces::DeleteRuleResourcePerm as u8,
             resource: ctx.accounts.rule.resource.to_string(),
-            roles: ctx.accounts.rule.roles.clone(),
+            permission_level: ctx.accounts.rule.permission_level.clone(),
         },
     )?;
 
