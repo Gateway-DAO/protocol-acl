@@ -46,4 +46,10 @@ pub enum Errors {
     CannotGrantSharePermission,
     #[msg("Cannot delete a role with a higher permission level than your own")]
     CannotDeleteHigherPermissionLevel,
+    #[msg("Missing user role account")]
+    MissingUserRole,
+    #[msg("Invalid user role account")]
+    InvalidUserRole,
+    #[msg("Invalid permission level")]
+    InvalidPermissionLevel,
 }

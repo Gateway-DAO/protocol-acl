@@ -22,15 +22,11 @@ pub struct AssignRole<'info> {
     #[account(
         seeds = [b"file".as_ref(), file.id.key().as_ref()],
         bump = file.bump,
+        constraint = file.authority == contributor.key() || (user_role.is_some() && user_role.as_ref().unwrap().can_share),
     )]
     pub file: Box<Account<'info, File>>,
 
-    #[account(
-        seeds = [contributor.key().as_ref(), file.id.key().as_ref()],
-        bump = user_role.bump,
-        constraint = user_role.address == contributor.key(),
-    )]
-    pub user_role: Box<Account<'info, Role>>,
+    pub user_role: Option<Account<'info, Role>>,
 
     #[account(mut)]
     pub rent_payer: Signer<'info>,
@@ -39,27 +35,44 @@ pub struct AssignRole<'info> {
 }
 
 pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -> Result<()> {
-    let user_role = &ctx.accounts.user_role;
+    let contributor_key = ctx.accounts.contributor.key();
+    let file = &ctx.accounts.file;
 
-    // Validate that the assigning user has the Share permission
-    if !user_role.can_share {
-        return Err(Errors::InsufficientSharePermission.into());
+    // Verify if role is between 1 and 3
+    if assign_role_data.permission_level < 1 || assign_role_data.permission_level > 3 {
+        return Err(Errors::InvalidPermissionLevel.into());
     }
 
-    // Validate that the permission level being assigned is less than or equal to the assigning user's level
-    if assign_role_data.permission_level > user_role.permission_level {
-        return Err(Errors::CannotGrantHigherPermissionLevel.into());
-    }
+    if contributor_key != file.authority {
+        let user_role = match &ctx.accounts.user_role {
+            Some(ur) => ur,
+            None => return Err(Errors::MissingUserRole.into()),
+        };
 
-    // Validate that the can_share flag is only true if the assigning user has can_share
-    if assign_role_data.can_share && !user_role.can_share {
-        return Err(Errors::CannotGrantSharePermission.into());
+        // Verify that the user_role PDA matches the expected address
+        let (expected_user_role_key, _) = Pubkey::find_program_address(
+            &[contributor_key.as_ref(), file.id.key().as_ref()],
+            ctx.program_id,
+        );
+        if user_role.key() != expected_user_role_key {
+            return Err(Errors::InvalidUserRole.into());
+        }
+
+        if !user_role.can_share {
+            return Err(Errors::InsufficientSharePermission.into());
+        }
+        if assign_role_data.permission_level > user_role.permission_level {
+            return Err(Errors::CannotGrantHigherPermissionLevel.into());
+        }
+        if assign_role_data.can_share && !user_role.can_share {
+            return Err(Errors::CannotGrantSharePermission.into());
+        }
     }
 
     // Initialize or update the Role account
     let role = &mut ctx.accounts.role;
     role.bump = ctx.bumps.role;
-    role.file_id = ctx.accounts.file.id;
+    role.file_id = file.id;
     role.address = assign_role_data.address;
     role.permission_level = assign_role_data.permission_level;
     role.can_share = assign_role_data.can_share;
@@ -68,7 +81,7 @@ pub fn assign_role(ctx: Context<AssignRole>, assign_role_data: AssignRoleData) -
 
     emit!(RolesChanged {
         time: utc_now(),
-        file_id: ctx.accounts.file.id,
+        file_id: file.id,
     });
     Ok(())
 }

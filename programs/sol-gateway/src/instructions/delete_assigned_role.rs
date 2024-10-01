@@ -23,12 +23,8 @@ pub struct DeleteAssignedRole<'info> {
     )]
     pub file: Box<Account<'info, File>>,
 
-    #[account(
-        seeds = [signer.key().as_ref(), file.id.key().as_ref()],
-        bump = user_role.bump,
-        constraint = user_role.address == signer.key(),
-    )]
-    pub user_role: Box<Account<'info, Role>>,
+    /// The signer's role account (optional if signer is the file authority)
+    pub user_role: Option<Account<'info, Role>>,
 
     /// CHECK: This account collects lamports from the closed account
     #[account(mut)]
@@ -36,12 +32,26 @@ pub struct DeleteAssignedRole<'info> {
 }
 
 pub fn delete_assigned_role(ctx: Context<DeleteAssignedRole>) -> Result<()> {
-    let user_role = &ctx.accounts.user_role;
-    let role_to_delete = &ctx.accounts.role;
+    let signer_key = ctx.accounts.signer.key();
     let file = &ctx.accounts.file;
+    let role_to_delete = &ctx.accounts.role;
 
-    // Check if the signer is the authority of the file
-    if ctx.accounts.signer.key() != file.authority {
+    if signer_key != file.authority {
+        let user_role = match &ctx.accounts.user_role {
+            Some(ur) => ur,
+            None => return Err(Errors::MissingUserRole.into()),
+        };
+
+        // Verify that the user_role PDA matches the expected address
+        let (expected_user_role_key, _) = Pubkey::find_program_address(
+            &[signer_key.as_ref(), file.id.key().as_ref()],
+            ctx.program_id,
+        );
+        if user_role.key() != expected_user_role_key {
+            return Err(Errors::InvalidUserRole.into());
+        }
+
+        // Perform validations
         if !user_role.can_share {
             return Err(Errors::InsufficientSharePermission.into());
         }
@@ -52,7 +62,7 @@ pub fn delete_assigned_role(ctx: Context<DeleteAssignedRole>) -> Result<()> {
 
     emit!(RolesChanged {
         time: utc_now(),
-        file_id: ctx.accounts.file.id,
+        file_id: file.id,
     });
     Ok(())
 }
