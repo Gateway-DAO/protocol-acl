@@ -38,7 +38,7 @@ pub fn initialize_files(ctx: Context<InitializeFiles>, file_data: FileData) -> R
     file.id = file_data.id;
     file.authority = ctx.accounts.contributor.key();
     file.recovery = file_data.recovery;
-    file.fid = validate_string_len(&file_data.fid, 0, 16)?; //
+    file.fid = validate_string_len(&file_data.fid, 0, 32)?; //
     file.fee = None;
     file.size = file_data.size;
     file.checksum = validate_string_len(&file_data.checksum, 0, 32)?;
